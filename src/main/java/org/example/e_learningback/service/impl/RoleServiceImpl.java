@@ -58,11 +58,11 @@ public class RoleServiceImpl implements RoleService {
         }
 
         Role roleToDelete = role.get();
-//        List<User> usersWithRole = roleToDelete.getUsers();
-//
-//        usersWithRole.forEach(user -> user.setRole(null));
-//
-//        userRepository.saveAll(usersWithRole);
+        List<User> usersWithRole = roleToDelete.getUsers();
+
+        usersWithRole.forEach(user -> user.setRole(null));
+
+        userRepository.saveAll(usersWithRole);
         roleRepository.delete(roleToDelete);
     }
 
@@ -79,13 +79,13 @@ public class RoleServiceImpl implements RoleService {
         roleToUpdate.setName(name);
 
 
-//        List<User> usersWithRole = roleToUpdate.getUsers();
-//        usersWithRole.forEach(user -> user.getRole().setName(roleToUpdate.getName()));
+        List<User> usersWithRole = roleToUpdate.getUsers();
+        usersWithRole.forEach(user -> user.getRole().setName(roleToUpdate.getName()));
 
 
         Role savedRole = roleRepository.save(roleToUpdate);
+        userRepository.saveAll(usersWithRole);
 
-//        userRepository.saveAll(usersWithRole);
         return genericMapper.map(savedRole, RoleDto.class);
     }
 }

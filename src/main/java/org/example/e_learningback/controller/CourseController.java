@@ -44,4 +44,9 @@ public class CourseController {
         courseService.deleteCourse(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/search")
+    public List<CourseDto> searchPosts(@RequestParam String keyword) {
+        return courseService.searchCourses(keyword);
+    }
 }

@@ -3,7 +3,9 @@ package org.example.e_learningback.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.CategoryDto;
 import org.example.e_learningback.entity.Category;
+import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.repository.CategoryRepository;
+import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.service.CategoryService;
 import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CourseRepository courseRepository;
     private final GenericMapper genericMapper;
 
     @Override
@@ -39,7 +42,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryDto createCategory(String name) {
         Category category = new Category();
-        System.out.println(name);
         category.setName(name);
         Category savedCategory = categoryRepository.save(category);
 
@@ -55,12 +57,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Category does not exist");
         }
 
-//        List<Post> posts = category.get().getPosts();
-//
-//        posts.forEach(post -> post.setCategory(null));
+        List<Course> courses = category.get().getCourses();
+
+        courses.forEach(course -> course.setCategory(null));
 
         categoryRepository.deleteById(id);
-//        postRepository.saveAll(posts);
+        courseRepository.saveAll(courses);
     }
 
     @Override
@@ -75,12 +77,12 @@ public class CategoryServiceImpl implements CategoryService {
         Category existCategory = category.get();
         existCategory.setName(name);
 
-//        List<Post> posts = category.get().getPosts();
-//
-//        posts.forEach(post -> post.getCategory().setName(existCategory.getName()));
+        List<Course> courses = category.get().getCourses();
+
+        courses.forEach(course -> course.getCategory().setName(existCategory.getName()));
 
         Category savedCategory = categoryRepository.save(existCategory);
-//        postRepository.saveAll(posts);
+        courseRepository.saveAll(courses);
 
         return genericMapper.map(savedCategory, CategoryDto.class);
     }

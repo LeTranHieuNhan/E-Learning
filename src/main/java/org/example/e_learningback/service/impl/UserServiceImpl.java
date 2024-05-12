@@ -1,8 +1,11 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.RoleDto;
 import org.example.e_learningback.dto.UserDto;
+import org.example.e_learningback.entity.Role;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.repository.RoleRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.UserService;
 import org.example.e_learningback.utils.GenericMapper;
@@ -18,6 +21,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final GenericMapper genericMapper;
 
     @Override
@@ -43,19 +47,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto createUser(UserDto newUserDTO) throws IOException {
 //        newUserDTO.setPassword(passwordEncoder.encode(newUserDTO.getPassword()));
-//        Role role = roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role does not exit "));
+        Role role = roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role does not exit "));
         User user = genericMapper.map(newUserDTO, User.class);
 
-        // Ensure that the role field is initialized
-//        if (user.getRole() == null) {
-//            user.setRole(new Role());
-//        }
 
-//        user.setRole(role);
+        if (user.getRole() == null) {
+            user.setRole(new Role());
+        }
+
+        user.setRole(role);
 
         User savedUser = userRepository.save(user);
         UserDto map = genericMapper.map(savedUser, UserDto.class);
-//        map.setRole(genericMapper.map(role, RoleDto.class));
+        map.setRole(genericMapper.map(role, RoleDto.class));
 
         return map;
     }
@@ -81,9 +85,15 @@ public class UserServiceImpl implements UserService {
         if(user.isPresent()) {
             User existingUser = user.get();
 
-            existingUser.setName(newUserDTO.getName());
-            existingUser.setEmail(newUserDTO.getEmail());
-            existingUser.setPassword(newUserDTO.getPassword());
+            if (newUserDTO.getName() != null) {
+                existingUser.setName(newUserDTO.getName());
+            }
+            if (newUserDTO.getEmail() != null) {
+                existingUser.setEmail(newUserDTO.getEmail());
+            }
+            if (newUserDTO.getPassword() != null) {
+                existingUser.setPassword(newUserDTO.getPassword());
+            }
 
             User savedUser = userRepository.save(existingUser);
 

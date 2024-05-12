@@ -15,4 +15,6 @@ public interface CourseService {
     void deleteCourse(Long id);
 
     CourseDto updateCourse(Long id, CourseDto newCourseDTO);
+
+    List<CourseDto> searchCourses(String keyword);
 }

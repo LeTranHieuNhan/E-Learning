@@ -12,4 +12,7 @@ public class CourseDto {
     private String title;
     private String description;
     private String course_duration;
+
+    private CategoryDto category;
+    private UserDto user;
 }

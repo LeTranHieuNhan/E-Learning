@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,12 +64,12 @@ public class CourseServiceImpl implements CourseService {
         User user = userOptional.get();
         Category category = categoryOptional.get();
 
-//        newCourse.setUser(user);
-//        newCourse.setCategory(category);
+        newCourse.setUser(user);
+        newCourse.setCategory(category);
 
         Course savedCourse = courseRepository.save(newCourse);
         CourseDto saveCourseDto = genericMapper.map(savedCourse, CourseDto.class);
-//        saveCourseDto.setUser(genericMapper.map(user, UserDto.class));
+        saveCourseDto.setUser(genericMapper.map(user, UserDto.class));
 
         return saveCourseDto;
     }
@@ -105,5 +106,13 @@ public class CourseServiceImpl implements CourseService {
         } else {
             throw new RuntimeException("Course with id " + id + " not found");
         }
+    }
+
+    @Override
+    public List<CourseDto> searchCourses(String keyword) {
+        List<Course> foundPosts = courseRepository.searchByTitleOrText(keyword);
+        return foundPosts.stream()
+                .map(post -> genericMapper.map(post, CourseDto.class))
+                .collect(Collectors.toList());
     }
 }
