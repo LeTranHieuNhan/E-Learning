@@ -9,6 +9,7 @@ import org.example.e_learningback.repository.RoleRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.UserService;
 import org.example.e_learningback.utils.GenericMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final GenericMapper genericMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setRole(role);
+        user.setPassword(passwordEncoder.encode(newUserDTO.getPassword()));
 
         User savedUser = userRepository.save(user);
         UserDto map = genericMapper.map(savedUser, UserDto.class);
@@ -82,7 +85,7 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(Long id, UserDto newUserDTO) {
         Optional<User> user = userRepository.findById(id);
 
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             User existingUser = user.get();
 
             if (newUserDTO.getName() != null) {
@@ -98,8 +101,7 @@ public class UserServiceImpl implements UserService {
             User savedUser = userRepository.save(existingUser);
 
             return genericMapper.map(savedUser, UserDto.class);
-        }
-        else {
+        } else {
             throw new RuntimeException("User not found with id: " + id);
         }
     }
