@@ -27,8 +27,8 @@ public class CourseController {
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto courseDto, @PathVariable Long userID, @RequestParam Long categoryID) {
+    @PostMapping("/{userID}/{categoryID}")
+    public ResponseEntity<CourseDto> createCourse(@RequestBody CourseDto courseDto, @PathVariable Long userID, @PathVariable Long categoryID) {
         CourseDto course = courseService.createCourse(courseDto, userID, categoryID);
         return new ResponseEntity<>(course, HttpStatus.OK);
     }

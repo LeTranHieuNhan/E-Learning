@@ -1,10 +1,13 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.dto.RoleDto;
 import org.example.e_learningback.dto.UserDto;
+import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.Role;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.RoleRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.UserService;
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final GenericMapper genericMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CourseRepository courseRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -74,7 +78,15 @@ public class UserServiceImpl implements UserService {
         boolean isExist = userRepository.existsById(id);
 
         if (isExist) {
+            User user = userRepository.findById(id).orElseThrow();
+            List<Course> courses = user.getCourses();
+          List <Course> exitCourse= courses.stream().map(course -> {
+                course.setUser(null);
+                return course;
+            }).toList();
+          courseRepository.saveAll(exitCourse);
             userRepository.deleteById(id);
+
         } else
             throw new RuntimeException("User doesnt exit with ID " + id);
     }
