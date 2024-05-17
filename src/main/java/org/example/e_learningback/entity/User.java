@@ -25,8 +25,10 @@ public class User {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "role_id")
     private Role role;
+
     @OneToMany(mappedBy = "user")
     private List<Course> courses = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "user")
+    private List<CourseRating> courseRatings = new ArrayList<>();
 }
