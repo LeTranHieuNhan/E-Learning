@@ -7,7 +7,7 @@ import java.util.List;
 public interface CourseRatingService {
     List<CourseRatingDto> findAllCourseRatings();
     CourseRatingDto findCourseRatingById(Long id);
-    List<CourseRatingDto> findCourseRatingByCourseId(Long courseId) throws Exception;
+    List<CourseRatingDto> findAllCourseRatingsByCourseId(Long courseId) throws Exception;
     CourseRatingDto createCourseRating(CourseRatingDto newCourseRatingDto, Long courseId, Long userId) throws Exception;
     CourseRatingDto updateCourseRating(Long courseRatingId, CourseRatingDto newCourseRatingDto) throws Exception;
     void deleteCourseRating(Long courseRatingId);

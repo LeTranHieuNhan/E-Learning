@@ -52,7 +52,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     }
 
     @Override
-    public List<CourseRatingDto> findCourseRatingByCourseId(Long courseId) throws Exception {
+    public List<CourseRatingDto> findAllCourseRatingsByCourseId(Long courseId) throws Exception {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
 
         if (courseOptional.isEmpty()) {
@@ -130,13 +130,11 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     @Transactional
     public void deleteCourseRating(Long courseRatingId) {
         if (courseRatingRepository.existsById(courseRatingId)) {
-            CourseRating existingCourseRating = courseRatingRepository.findById(courseRatingId).get();
-            Course course = courseRepository.findById(existingCourseRating.getCourse().getId()).get();
-            User user = userRepository.findById(existingCourseRating.getUser().getId()).get();
 
-            courseRepository.save(course);
-            userRepository.save(user);
             courseRatingRepository.deleteById(courseRatingId);
+
+        } else {
+            throw new RuntimeException("Course rating not found");
         }
     }
 }

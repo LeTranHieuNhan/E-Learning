@@ -12,4 +12,6 @@ public class CourseSessionDto {
     private String title;
     private Long order;
     private String video_url;
+
+    private CourseDto courseDto;
 }

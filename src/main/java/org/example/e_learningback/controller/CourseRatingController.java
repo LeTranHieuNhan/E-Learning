@@ -27,7 +27,7 @@ public class CourseRatingController {
 
     @GetMapping("/course_ratings/{courseId}")
     public ResponseEntity<List<CourseRatingDto>> getCourseRatingsByCourseId(@PathVariable Long courseId) throws Exception {
-        return new ResponseEntity<>(courseRatingService.findCourseRatingByCourseId(courseId), HttpStatus.OK);
+        return new ResponseEntity<>(courseRatingService.findAllCourseRatingsByCourseId(courseId), HttpStatus.OK);
     }
 
     @PostMapping("/{courseId}/{userId}")
