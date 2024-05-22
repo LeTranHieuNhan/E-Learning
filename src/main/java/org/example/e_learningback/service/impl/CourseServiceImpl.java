@@ -31,10 +31,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDto> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
-        List<CourseDto> courseDtos = genericMapper.mapList(courses, CourseDto.class);
-
-
-        return courseDtos;
+        return genericMapper.mapList(courses, CourseDto.class);
     }
 
 

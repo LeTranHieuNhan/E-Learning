@@ -36,7 +36,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDto> updateCategory(@PathVariable Long id, @RequestParam String name) {
-        CategoryDto updatedCategory = categoryService.udpateCategory(id, name);
+        CategoryDto updatedCategory = categoryService.updateCategory(id, name);
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
     }
 

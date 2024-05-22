@@ -67,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto udpateCategory(Long id, String name) {
+    public CategoryDto updateCategory(Long id, String name) {
         Optional<Category> category = categoryRepository.findById(id);
 
         if(!category.isPresent()) {
