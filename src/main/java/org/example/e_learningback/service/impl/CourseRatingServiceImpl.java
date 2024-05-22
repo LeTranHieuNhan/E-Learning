@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,6 +94,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
         courseRating.setUser(userOptional.get());
         courseRating.setCourse(courseOptional.get());
+        courseRating.setCreated_at(new Date());
 
         CourseRatingDto createdCourseRatingDto = genericMapper.map(courseRatingRepository.save(courseRating), CourseRatingDto.class);
 

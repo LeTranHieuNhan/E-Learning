@@ -15,5 +15,6 @@ public class AssignmentDto {
     private String name;
     private Date uploaded_at;
     private Date updated_at;
-    private String deadline;
+    private Date deadline;
+
 }

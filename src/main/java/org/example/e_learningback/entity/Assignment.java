@@ -1,10 +1,7 @@
 package org.example.e_learningback.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,5 +19,9 @@ public class Assignment {
     private String name;
     private Date uploaded_at;
     private Date updated_at;
-    private String deadline;
+    private Date deadline;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 }
