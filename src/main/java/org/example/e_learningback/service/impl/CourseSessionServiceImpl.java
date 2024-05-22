@@ -90,8 +90,8 @@ public class CourseSessionServiceImpl implements CourseSessionService {
 
         CourseSession courseSession = optionalCourseSession.get();
         courseSession.setTitle(newCourseSessionDto.getTitle());
-        courseSession.setOrder(newCourseSessionDto.getOrder());
-        courseSession.setVideo_url(newCourseSessionDto.getVideo_url());
+        courseSession.setSessionOrder(newCourseSessionDto.getSessionOrder());
+        courseSession.setVideoUrl(newCourseSessionDto.getVideo_url());
 
         CourseSessionDto updatedCourseSessionDto = genericMapper.map(courseSession, CourseSessionDto.class);
 

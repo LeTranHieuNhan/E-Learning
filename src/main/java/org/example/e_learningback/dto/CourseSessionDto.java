@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class CourseSessionDto {
     private Long id;
     private String title;
-    private Long order;
+    private Long sessionOrder;
     private String video_url;
 
     private CourseDto courseDto;

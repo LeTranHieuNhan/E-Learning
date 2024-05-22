@@ -9,15 +9,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "course_session")
 public class CourseSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private Long order;
-    private String video_url;
+
+    @Column(name = "session_order")
+    private Long sessionOrder;
+
+    private String videoUrl;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
 }
+
