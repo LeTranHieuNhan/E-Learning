@@ -18,6 +18,5 @@ public class CourseRatingDto {
     private String review;
     private Date created_at;
 
-    private CourseDto course;
     private UserDto user;
 }

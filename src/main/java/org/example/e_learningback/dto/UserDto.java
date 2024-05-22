@@ -19,6 +19,4 @@ public class UserDto {
     private String password;
 
     private RoleDto role;
-    private List<CourseDto> courses;
-    private List<CourseRatingDto> courseRatings;
 }
