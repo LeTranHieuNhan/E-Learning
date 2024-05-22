@@ -9,5 +9,5 @@ public interface CategoryService {
     CategoryDto findCategoryById (Long id);
     CategoryDto createCategory(String name);
     void deleteCategory(Long id);
-    CategoryDto udpateCategory(Long id, String name);
+    CategoryDto updateCategory(Long id, String name);
 }
