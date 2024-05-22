@@ -31,8 +31,16 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public List<CourseDto> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
-        return genericMapper.mapList(courses, CourseDto.class);
+        List<CourseDto> courseDtos = genericMapper.mapList(courses, CourseDto.class);
+
+courseDtos.stream().map(courseDto -> {
+            courseDto.getUser().setCourses(null);
+            return courseDto;
+        }).collect(Collectors.toList());
+
+        return courseDtos;
     }
+
 
     @Override
     public CourseDto findCourseById(Long id) {
@@ -69,6 +77,7 @@ public class CourseServiceImpl implements CourseService {
         Course savedCourse = courseRepository.save(newCourse);
         CourseDto saveCourseDto = genericMapper.map(savedCourse, CourseDto.class);
         saveCourseDto.setUser(genericMapper.map(user, UserDto.class));
+        saveCourseDto.getUser().setCourses(null);
 
         return saveCourseDto;
     }
@@ -78,7 +87,7 @@ public class CourseServiceImpl implements CourseService {
     public void deleteCourse(Long id) {
         boolean isExist = courseRepository.existsById(id);
 
-        if(isExist) {
+        if (isExist) {
             Course course = courseRepository.findById(id).get();
 //            commentRepository.deleteAll(course.getComments());
             courseRepository.deleteById(id);
@@ -96,7 +105,6 @@ public class CourseServiceImpl implements CourseService {
             existingCourse.setTitle(newCourseDTO.getTitle());
             existingCourse.setDescription(newCourseDTO.getDescription());
             existingCourse.setCourse_duration(newCourseDTO.getCourse_duration());
-
 
 
             Course savedCourse = courseRepository.save(existingCourse);

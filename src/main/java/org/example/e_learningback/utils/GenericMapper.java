@@ -15,10 +15,7 @@ public class GenericMapper {
 
     private final ModelMapper modelMapper;
 
-//    @Autowired
-//    public GenericMapper(ModelMapper modelMapper) {
-//        this.modelMapper = modelMapper;
-//    }
+
 
     public <S, T> T map(S source, Class<T> targetClass) {
         if (source == null) {
