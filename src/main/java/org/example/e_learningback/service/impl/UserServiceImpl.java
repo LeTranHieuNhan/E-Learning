@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
+
+
         return genericMapper.mapList(users, UserDto.class);
     }
 

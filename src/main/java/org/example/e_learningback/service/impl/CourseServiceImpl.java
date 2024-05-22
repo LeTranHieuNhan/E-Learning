@@ -33,10 +33,6 @@ public class CourseServiceImpl implements CourseService {
         List<Course> courses = courseRepository.findAll();
         List<CourseDto> courseDtos = genericMapper.mapList(courses, CourseDto.class);
 
-courseDtos.stream().map(courseDto -> {
-            courseDto.getUser().setCourses(null);
-            return courseDto;
-        }).collect(Collectors.toList());
 
         return courseDtos;
     }
@@ -77,7 +73,6 @@ courseDtos.stream().map(courseDto -> {
         Course savedCourse = courseRepository.save(newCourse);
         CourseDto saveCourseDto = genericMapper.map(savedCourse, CourseDto.class);
         saveCourseDto.setUser(genericMapper.map(user, UserDto.class));
-        saveCourseDto.getUser().setCourses(null);
 
         return saveCourseDto;
     }

@@ -11,7 +11,6 @@ public class CourseSessionDto {
     private Long id;
     private String title;
     private Long sessionOrder;
-    private String video_url;
+    private String videoUrl;
 
-    private CourseDto courseDto;
 }

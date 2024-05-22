@@ -76,6 +76,8 @@ public class CourseSessionImpl implements CourseSessionService {
         courseSession.setId(null);
         courseSession.setCourse(courseOptional.get());
 
+        System.out.println("url " + newCourseSessionDto.getVideoUrl());
+        System.out.println(courseSession.getVideoUrl());
         CourseSessionDto createdCourseSessionDto = genericMapper.map(courseSessionRepository.save(courseSession), CourseSessionDto.class);
 
         return createdCourseSessionDto;
@@ -93,7 +95,7 @@ public class CourseSessionImpl implements CourseSessionService {
         CourseSession courseSession = optionalCourseSession.get();
         courseSession.setTitle(newCourseSessionDto.getTitle());
         courseSession.setSessionOrder(newCourseSessionDto.getSessionOrder());
-        courseSession.setVideoUrl(newCourseSessionDto.getVideo_url());
+        courseSession.setVideoUrl(newCourseSessionDto.getVideoUrl());
 
         CourseSessionDto updatedCourseSessionDto = genericMapper.map(courseSession, CourseSessionDto.class);
 
