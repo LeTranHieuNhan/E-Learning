@@ -1,10 +1,8 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.e_learningback.dto.CourseRatingDto;
 import org.example.e_learningback.dto.CourseSessionDto;
 import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.CourseRating;
 import org.example.e_learningback.entity.CourseSession;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.CourseSessionRepository;
@@ -19,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CourseSessionImpl implements CourseSessionService {
+public class CourseSessionServiceImpl implements CourseSessionService {
 
     private final CourseSessionRepository courseSessionRepository;
     private final CourseRepository courseRepository;
