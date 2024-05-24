@@ -37,7 +37,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     public AssignmentDto findAssignmentById(Long id) {
         Optional<Assignment> assignment = assignmentRepository.findById(id);
 
-        if (!assignment.isPresent()) {
+        if (assignment.isEmpty()) {
             throw new RuntimeException("Assignment does not exist");
         }
 
