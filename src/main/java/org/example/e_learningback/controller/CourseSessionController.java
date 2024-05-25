@@ -3,9 +3,11 @@ package org.example.e_learningback.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.CourseSessionDto;
 import org.example.e_learningback.service.CourseSessionService;
+import org.example.e_learningback.service.impl.StorageServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 @RequestMapping("/api/v1/course_sessions")
 public class CourseSessionController {
     private final CourseSessionService courseSessionService;
+    private  final StorageServiceImpl storageService;
 
     @GetMapping()
     public ResponseEntity<List<CourseSessionDto>> getCourseSessions() {
@@ -31,7 +34,7 @@ public class CourseSessionController {
     }
 
     @PostMapping("/{courseId}")
-    public ResponseEntity<CourseSessionDto> createCourseSession(@RequestBody CourseSessionDto newCourseSession, @PathVariable Long courseId) throws Exception {
+    public ResponseEntity<CourseSessionDto> createCourseSession(@RequestBody CourseSessionDto newCourseSession, @PathVariable Long courseId ) throws Exception {
         return new ResponseEntity<>(courseSessionService.createCourseSession(newCourseSession, courseId), HttpStatus.CREATED);
     }
 
