@@ -16,5 +16,4 @@ public class AssignmentDto {
     private Date uploaded_at;
     private Date updated_at;
     private Date deadline;
-
 }

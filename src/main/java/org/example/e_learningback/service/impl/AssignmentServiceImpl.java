@@ -57,6 +57,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         for (Assignment assignment : assignments) {
             AssignmentDto assignmentDto = genericMapper.map(assignment, AssignmentDto.class);
+            assignmentDto.setCourseDto(genericMapper.map(courseOptional.get(), CourseDto.class));
             assignmentDtos.add(assignmentDto);
         }
 
