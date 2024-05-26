@@ -57,7 +57,6 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         for (Assignment assignment : assignments) {
             AssignmentDto assignmentDto = genericMapper.map(assignment, AssignmentDto.class);
-            assignmentDto.setCourseDto(genericMapper.map(courseOptional.get(), CourseDto.class));
             assignmentDtos.add(assignmentDto);
         }
 
@@ -78,6 +77,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignment.setId(null);  // Ensure a new entity is created
         assignment.setUploaded_at(new Date());
         assignment.setUpdated_at(null);
+        assignment.setCourse(courseOptional.get());
 
         Assignment savedAssignment = assignmentRepository.save(assignment);
         return genericMapper.map(savedAssignment, AssignmentDto.class);

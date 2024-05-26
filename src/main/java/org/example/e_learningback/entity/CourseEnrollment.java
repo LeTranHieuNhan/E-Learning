@@ -6,15 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "student_session")
-public class StudentSession {
+public class CourseEnrollment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private double courseGrade;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
@@ -23,13 +23,4 @@ public class StudentSession {
     @ManyToOne
     @JoinColumn(name = "student_id")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "course_session_id")
-    private CourseSession courseSession;
-
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
 }
