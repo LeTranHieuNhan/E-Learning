@@ -1,0 +1,27 @@
+cloud:
+  aws:
+    credentials:
+      access-key: AKIA5FTZASWV334RN5NU
+      secret-key: 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
+    region:
+      static: ap-southeast-2
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: elearning29
+
+
+# application.yml
+#spring:
+#  servlet:
+#    multipart:
+#      max-file-size: 12GB
+#      max-request-size: 21GB
+
+
+
+server:
+  port: 9090
+  max-http-request-header-size: 100MB

@@ -37,7 +37,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     public AssignmentDto findAssignmentById(Long id) {
         Optional<Assignment> assignment = assignmentRepository.findById(id);
 
-        if (!assignment.isPresent()) {
+        if (assignment.isEmpty()) {
             throw new RuntimeException("Assignment does not exist");
         }
 
@@ -77,6 +77,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignment.setId(null);  // Ensure a new entity is created
         assignment.setUploaded_at(new Date());
         assignment.setUpdated_at(null);
+        assignment.setCourse(courseOptional.get());
 
         Assignment savedAssignment = assignmentRepository.save(assignment);
         return genericMapper.map(savedAssignment, AssignmentDto.class);

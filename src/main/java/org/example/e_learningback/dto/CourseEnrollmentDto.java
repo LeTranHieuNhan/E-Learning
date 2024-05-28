@@ -1,19 +1,16 @@
 package org.example.e_learningback.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentDto {
+public class CourseEnrollmentDto {
     private Long id;
-    private String name;
-    private Date uploaded_at;
-    private Date updated_at;
-    private Date deadline;
+    private double courseGrade;
+
+    private CourseDto course;
+    private UserDto user;
 }
