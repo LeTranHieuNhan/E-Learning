@@ -1,6 +1,5 @@
 package org.example.e_learningback.controller;
 
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,22 +19,31 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CourseEnrollmentController {
 
-    CourseEnrollmentService courseEnrollmentService;
+    final CourseEnrollmentService courseEnrollmentService;
 
-    @GetMapping("/courses/{courseId}")
-    public ResponseEntity<List<UserDto>> getAllEnrolledUsersByCourseId(@PathVariable Long courseId) throws Exception {
+    @GetMapping("/courses/users")
+    public ResponseEntity<List<UserDto>> getAllEnrolledUsersByCourseId(@RequestParam Long courseId) throws Exception {
         List<UserDto> users = courseEnrollmentService.findAllEnrolledUsersByCourseId(courseId);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<CourseDto>> getAllEnrolledUsersByUserId(@PathVariable Long userId) throws Exception {
+    @PostMapping("/courses/users/enroll")
+    public ResponseEntity<Void> enrollUserToCourse(
+            @RequestParam Long courseId,
+            @RequestParam Long userId
+    ) throws Exception {
+        courseEnrollmentService.enrollUserToCourse(courseId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/users/courses")
+    public ResponseEntity<List<CourseDto>> getAllEnrolledCoursesByUserId(@RequestParam Long userId) throws Exception {
         List<CourseDto> courses = courseEnrollmentService.findAllEnrolledCoursesByUserId(userId);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping("/courses/grades/{courseId}")
-    public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByCourseId(@PathVariable Long courseId) {
+    @GetMapping("/courses/grades")
+        public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByCourseId(@RequestParam Long courseId) {
         try {
             List<CourseEnrollmentDto> grades = courseEnrollmentService.findAllGradesByCourseId(courseId);
             return ResponseEntity.ok(grades);
@@ -44,8 +52,8 @@ public class CourseEnrollmentController {
         }
     }
 
-    @GetMapping("/users/grades/{userId}")
-    public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByUserId(@PathVariable Long userId) {
+    @GetMapping("/users/grades")
+    public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByUserId(@RequestParam Long userId) {
         try {
             List<CourseEnrollmentDto> grades = courseEnrollmentService.findAllGradesByUserId(userId);
             return ResponseEntity.ok(grades);
@@ -54,8 +62,11 @@ public class CourseEnrollmentController {
         }
     }
 
-    @GetMapping("/courses/{courseId}/users/{userId}")
-    public ResponseEntity<CourseEnrollmentDto> getGrade(@PathVariable Long courseId, @PathVariable Long userId) {
+    @GetMapping("/courses/users/grade")
+    public ResponseEntity<CourseEnrollmentDto> getGrade(
+            @RequestParam Long courseId,
+            @RequestParam Long userId
+    ) {
         try {
             CourseEnrollmentDto grade = courseEnrollmentService.findGrade(courseId, userId);
             return ResponseEntity.ok(grade);
@@ -64,8 +75,12 @@ public class CourseEnrollmentController {
         }
     }
 
-    @PostMapping("/courses/{courseId}/users/{userId}")
-    public ResponseEntity<CourseEnrollmentDto> createCourse(@RequestParam double grade, @PathVariable Long courseId, @PathVariable Long userId) throws Exception {
+    @PostMapping("/courses/users/grade")
+    public ResponseEntity<CourseEnrollmentDto> createGrade(
+            @RequestParam double grade,
+            @RequestParam Long courseId,
+            @RequestParam Long userId
+    ) throws Exception {
         try {
             CourseEnrollmentDto createdGrade = courseEnrollmentService.createGrade(courseId, userId, grade);
             return ResponseEntity.ok(createdGrade);
@@ -73,9 +88,26 @@ public class CourseEnrollmentController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+    @PutMapping("/courses/users/grade")
+    public ResponseEntity<Void> updateGrade (
+            @RequestParam double grade,
+                @RequestParam Long courseId,
+            @RequestParam Long userId
+    ) {
+        try {
+            System.out.println("updateGrade");
+            courseEnrollmentService.updateGrade(courseId, userId, grade);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
-    @DeleteMapping("/courses/{courseId}/users/{userId}")
-    public ResponseEntity<Void> deleteGrade(@PathVariable Long courseId, @PathVariable Long userId) {
+    @DeleteMapping("/courses/users/grade")
+    public ResponseEntity<Void> deleteGrade(
+            @RequestParam Long courseId,
+            @RequestParam Long userId
+    ) {
         try {
             courseEnrollmentService.deleteGrade(courseId, userId);
             return ResponseEntity.noContent().build();

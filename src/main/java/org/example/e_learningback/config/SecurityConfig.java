@@ -48,6 +48,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "api/v1/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "api/v1/users/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/users").permitAll()
+                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/grades").permitAll()
+                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{userId}/grades").permitAll()
+                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/{userId}/grade").permitAll()
+
 
                         .anyRequest().authenticated()
                 )

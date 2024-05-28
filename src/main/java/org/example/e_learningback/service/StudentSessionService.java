@@ -1,10 +1,14 @@
 package org.example.e_learningback.service;
 
+import org.example.e_learningback.dto.StudentSessionDto;
+
+import java.util.List;
+
 public interface StudentSessionService {
 
-    String saveStudentSession(Long courseId, Long studentId, Long courseSessionId);
+    String changeStudentSessionStatus(Long courseId, Long studentId, Long courseSessionId);
     void deleteStudentSession(Long courseId, Long studentId, Long courseSessionId);
-    void getStudentSession(Long courseId, Long studentId, Long courseSessionId);
-    void getAllStudentSession(Long courseId);
+    StudentSessionDto getStudentSession(Long courseId, Long studentId, Long courseSessionId);
+    List<StudentSessionDto> getAllStudentSessionByCourseIdAndStudentID(Long courseId, Long studentID);
 
 }

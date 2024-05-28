@@ -1,16 +1,10 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.e_learningback.dto.CourseDto;
-import org.example.e_learningback.dto.CourseEnrollmentDto;
-import org.example.e_learningback.dto.UserDto;
-import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.CourseEnrollment;
-import org.example.e_learningback.entity.User;
-import org.example.e_learningback.repository.CourseEnrollmentRepository;
-import org.example.e_learningback.repository.CourseRepository;
-import org.example.e_learningback.repository.UserRepository;
-import org.example.e_learningback.service.CourseEnrollmentService;
+import org.example.e_learningback.dto.*;
+import org.example.e_learningback.entity.*;
+import org.example.e_learningback.repository.*;
+import org.example.e_learningback.service.*;
 import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,144 +16,130 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
+
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final StudentSessionRepository studentSessionRepository;
     private final GenericMapper genericMapper;
+
     @Override
-    public List<UserDto> findAllEnrolledUsersByCourseId(Long courseId) throws Exception {
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
-
-        if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
-        }
-
-        Course course = courseOptional.get();
-        List<CourseEnrollment> enrollments = course.getCourseEnrollments();
-        List<UserDto> enrolledUsers = enrollments.stream()
+    @Transactional(readOnly = true)
+    public List<UserDto> findAllEnrolledUsersByCourseId(Long courseId) {
+        Course course = getCourseById(courseId);
+        return course.getCourseEnrollments().stream()
                 .map(enrollment -> genericMapper.map(enrollment.getUser(), UserDto.class))
                 .collect(Collectors.toList());
-
-        return enrolledUsers;
-    }
-
-    @Override
-    public List<CourseDto> findAllEnrolledCoursesByUserId(Long userId) throws Exception {
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isEmpty()) {
-            throw new Exception("User does not exist");
-        }
-
-        User user = userOptional.get();
-        List<CourseEnrollment> enrollments = user.getCourseEnrollments();
-        List<CourseDto> enrolledCourses = enrollments.stream()
-                .map(enrollment -> genericMapper.map(enrollment.getCourse(), CourseDto.class))
-                .collect(Collectors.toList());
-
-        return enrolledCourses;
-    }
-
-    @Override
-    public List<CourseEnrollmentDto> findAllGradesByCourseId(Long courseId) throws Exception {
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
-
-        if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
-        }
-
-        Course course = courseOptional.get();
-        List<CourseEnrollment> enrollments = course.getCourseEnrollments();
-        List<CourseEnrollmentDto> grades = enrollments.stream()
-                .map(enrollment -> genericMapper.map(enrollment, CourseEnrollmentDto.class))
-                .collect(Collectors.toList());
-
-        return grades;
-    }
-
-    @Override
-    public List<CourseEnrollmentDto> findAllGradesByUserId(Long userId) throws Exception {
-        Optional<User> userOptional  = userRepository.findById(userId);
-
-        if (userOptional.isEmpty()) {
-            throw new Exception("User does not exist");
-        }
-
-        User user = userOptional.get();
-        List<CourseEnrollment> enrollments = user.getCourseEnrollments();
-        List<CourseEnrollmentDto> grades = enrollments.stream()
-                .map(enrollment -> genericMapper.map(enrollment, CourseEnrollmentDto.class))
-                .collect(Collectors.toList());
-
-        return grades;
-    }
-
-    @Override
-    public CourseEnrollmentDto findGrade(Long courseId, Long userId) throws Exception {
-        Optional<CourseEnrollment> courseEnrollmentOptional = courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
-
-        if (courseEnrollmentOptional.isEmpty()) {
-            throw new Exception("Course enrollment does not exist");
-        }
-
-        CourseEnrollment courseEnrollment = courseEnrollmentOptional.get();
-
-        return genericMapper.map(courseEnrollment, CourseEnrollmentDto.class);
     }
 
     @Override
     @Transactional
-    public CourseEnrollmentDto createGrade(Long courseId, Long userId, double grade) throws Exception {
-        Optional<User> userOptional = userRepository.findById(userId);
-        Optional<Course> courseOptional = courseRepository.findById(courseId);
+    public void enrollUserToCourse(Long courseId, Long userId) {
+        User user = getUserById(userId);
+        Course course = getCourseById(courseId);
+        CourseEnrollment enrollment = new CourseEnrollment();
+        enrollment.setUser(user);
+        enrollment.setCourse(course);
+        courseEnrollmentRepository.save(enrollment);
+        initializeAllStudentSessions(courseId, userId);
+    }
 
-        if (userOptional.isEmpty()) {
-            throw new Exception("User does not exist");
-        }
+    @Transactional
+    protected void initializeAllStudentSessions(Long courseId, Long userId) {
+        Course course = getCourseById(courseId);
+        User user = getUserById(userId);
+        course.getCourseSessions().forEach(courseSession -> initializeStudentSession(courseSession, user));
+    }
 
-        if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
-        }
+    @Transactional
+    public void initializeStudentSession(CourseSession courseSession, User user) {
+        StudentSession studentSession = new StudentSession();
+        Course course = courseSession.getCourse();
+        studentSession.setCourse(course);
+        studentSession.setUser(user);
+        studentSession.setStatus(Status.UNWATCHED);
+        studentSession.setCourseSession(courseSession);
+        studentSessionRepository.save(studentSession);
+    }
 
-        User user = userOptional.get();
-        Course course = courseOptional.get();
+    @Override
+    @Transactional(readOnly = true)
+    public List<CourseDto> findAllEnrolledCoursesByUserId(Long userId) {
+        User user = getUserById(userId);
+        return user.getCourseEnrollments().stream()
+                .map(enrollment -> genericMapper.map(enrollment.getCourse(), CourseDto.class))
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CourseEnrollmentDto> findAllGradesByCourseId(Long courseId) {
+        Course course = getCourseById(courseId);
+        return course.getCourseEnrollments().stream()
+                .map(enrollment -> genericMapper.map(enrollment, CourseEnrollmentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public List<CourseEnrollmentDto> findAllGradesByUserId(Long userId) {
+        User user = getUserById(userId);
+        return user.getCourseEnrollments().stream()
+                .map(enrollment -> genericMapper.map(enrollment, CourseEnrollmentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseEnrollmentDto findGrade(Long courseId, Long userId) {
+        System.out.println(courseId + " " + userId);
+        CourseEnrollment enrollment = getCourseEnrollmentByCourseIdAndUserId(courseId, userId);
+            return genericMapper.map(enrollment, CourseEnrollmentDto.class);
+    }
+
+    @Override
+    @Transactional
+    public CourseEnrollmentDto createGrade(Long courseId, Long userId, double grade) {
+        User user = getUserById(userId);
+        Course course = getCourseById(courseId);
         CourseEnrollment enrollment = new CourseEnrollment();
         enrollment.setUser(user);
         enrollment.setCourse(course);
         enrollment.setCourseGrade(grade);
-
         courseEnrollmentRepository.save(enrollment);
-
         return genericMapper.map(enrollment, CourseEnrollmentDto.class);
     }
 
     @Override
     @Transactional
-    public void deleteGrade(Long courseId, Long userId) throws Exception {
-        Optional<CourseEnrollment> courseEnrollmentOptional = courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
-
-        if (courseEnrollmentOptional.isEmpty()) {
-            throw new Exception("Course enrollment does not exist");
-        }
-
-
-        courseEnrollmentRepository.delete(courseEnrollmentOptional.get());
+    public void deleteGrade(Long courseId, Long userId) {
+        CourseEnrollment enrollment = getCourseEnrollmentByCourseIdAndUserId(courseId, userId);
+        enrollment.setCourseGrade(-1);
+        courseEnrollmentRepository.save(enrollment);
     }
 
     @Override
     @Transactional
-    public CourseEnrollmentDto updateGrade(Long courseId, Long userId, double grade) throws Exception{
-        Optional<CourseEnrollment> courseEnrollmentOptional = courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
+    public CourseEnrollmentDto updateGrade(Long courseId, Long userId, double grade) {
+        CourseEnrollment enrollment = getCourseEnrollmentByCourseIdAndUserId(courseId, userId);
+        enrollment.setCourseGrade(grade);
+        courseEnrollmentRepository.save(enrollment);
+        return genericMapper.map(enrollment, CourseEnrollmentDto.class);
+    }
 
-        if (courseEnrollmentOptional.isEmpty()) {
-            throw new Exception("Course enrollment does not exist");
-        }
+    // Helper methods
 
-        CourseEnrollment courseEnrollment = courseEnrollmentOptional.get();
-        courseEnrollment.setCourseGrade(grade);
-        courseEnrollmentRepository.save(courseEnrollment);
+    private Course getCourseById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalArgumentException("Course does not exist with ID: " + courseId));
+    }
 
-        return genericMapper.map(courseEnrollment, CourseEnrollmentDto.class);
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist with ID: " + userId));
+    }
+
+    private CourseEnrollment getCourseEnrollmentByCourseIdAndUserId(Long courseId, Long userId) {
+        return courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Course enrollment does not exist for courseId: " + courseId + " and userId: " + userId));
     }
 }

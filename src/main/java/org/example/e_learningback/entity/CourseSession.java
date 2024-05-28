@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "course_session")
+@Table(name = "course_session", uniqueConstraints = @UniqueConstraint(columnNames = "session_order"))
 public class CourseSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +20,7 @@ public class CourseSession {
     private String title;
 
     @Column(name = "session_order")
+
     private Long sessionOrder;
 
     private String videoUrl;

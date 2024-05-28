@@ -29,7 +29,7 @@ public class StudentSession {
     private CourseSession courseSession;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private Status status;
 
 }
