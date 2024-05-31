@@ -40,18 +40,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("api/v1/roles").permitAll()
                         .requestMatchers("/api/v1/auth/{token}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/courses").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/courses/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/courses/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/users").permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/users/{id}").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/users").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/grades").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{userId}/grades").permitAll()
-                        .requestMatchers(HttpMethod.GET,"api/v1/course_enrollments/{courseId}/{userId}/grade").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/course_enrollments/{courseId}/users").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/course_enrollments/{courseId}/grades").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/course_enrollments/{userId}/grades").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/course_enrollments/{courseId}/{userId}/grade").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/users/teacher/{id}").permitAll()
+                        .requestMatchers("/api/v1/course_sessions/**").permitAll()
+
 
 
                         .anyRequest().authenticated()

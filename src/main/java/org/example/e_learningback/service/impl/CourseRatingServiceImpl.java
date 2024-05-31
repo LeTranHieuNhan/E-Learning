@@ -32,7 +32,16 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     @Override
     public List<CourseRatingDto> findAllCourseRatings() {
         List<CourseRating> courseRatings = courseRatingRepository.findAll();
-        return genericMapper.mapList(courseRatings, CourseRatingDto.class);
+
+        List<CourseRatingDto> courseRatingDtos = genericMapper.mapList(courseRatings, CourseRatingDto.class);
+        courseRatingDtos.forEach(courseRatingDto -> {
+            courseRatings.forEach(courseRating -> {
+                if (courseRatingDto.getId().equals(courseRating.getId())) {
+                    courseRatingDto.setCourseId(courseRating.getCourse().getId());
+                }
+            });
+        });
+        return courseRatingDtos;
     }
 
     @Override

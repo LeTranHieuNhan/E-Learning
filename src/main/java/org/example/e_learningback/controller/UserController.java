@@ -2,6 +2,7 @@ package org.example.e_learningback.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.TeacherProfileDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -43,5 +44,9 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+    @GetMapping("/teacher/{id}")
+    public ResponseEntity<TeacherProfileDto> getTeacherProfile(@PathVariable Long id) {
+        return new ResponseEntity<>(userService.getTeacherProfile(id), HttpStatus.OK);
     }
 }

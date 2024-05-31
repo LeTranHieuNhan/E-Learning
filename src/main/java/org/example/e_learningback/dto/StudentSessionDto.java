@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.e_learningback.entity.Course;
+import org.example.e_learningback.entity.Status;
 
 @Data
 @AllArgsConstructor
@@ -11,6 +12,8 @@ import org.example.e_learningback.entity.Course;
 public class StudentSessionDto {
 
     private Long id;
-    private String status;
+    private Status status;
     private CourseSessionDto courseSession;
+
+
 }

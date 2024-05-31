@@ -28,6 +28,12 @@ public class Course {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Transient
+    private Double averageRating;
+
+    @Transient
+    private Long totalReviews;
+
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseRating> courseRatings = new ArrayList<>();
 
@@ -42,4 +48,6 @@ public class Course {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<File> images = new ArrayList<>();
 }

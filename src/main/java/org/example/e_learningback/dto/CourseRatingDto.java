@@ -19,4 +19,5 @@ public class CourseRatingDto {
     private Date created_at;
 
     private UserDto user;
+    private Long courseId;
 }

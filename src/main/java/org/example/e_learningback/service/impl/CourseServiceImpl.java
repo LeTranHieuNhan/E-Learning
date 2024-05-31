@@ -5,8 +5,10 @@ import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.Category;
 import org.example.e_learningback.entity.Course;
+import org.example.e_learningback.entity.CourseRating;
 import org.example.e_learningback.entity.User;
 import org.example.e_learningback.repository.CategoryRepository;
+import org.example.e_learningback.repository.CourseRatingRepository;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.CourseService;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,10 +30,24 @@ public class CourseServiceImpl implements CourseService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final GenericMapper genericMapper;
+    private final CourseRatingRepository courseRatingRepository;
 
     @Override
     public List<CourseDto> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
+        courses.forEach(course -> {
+
+List<CourseRating> courseRatings = courseRatingRepository.findAllByCourseId(course.getId());
+            double averageRating = courseRatings.stream()
+                    .mapToDouble(CourseRating::getRating)
+                    .average()
+                    .orElse(0.0);
+            course.setAverageRating(averageRating);
+            course.setTotalReviews((long) courseRatings.size());
+
+
+        });
+
         return genericMapper.mapList(courses, CourseDto.class);
     }
 
@@ -43,7 +60,15 @@ public class CourseServiceImpl implements CourseService {
             throw new RuntimeException("Course does not exist");
         }
 
-        return genericMapper.map(course.get(), CourseDto.class);
+course.get().setTotalReviews((long) courseRatingRepository.findAllByCourseId(course.get().getId()).size());
+course.get().setAverageRating(courseRatingRepository.findAllByCourseId(course.get().getId()).stream()
+                .mapToDouble(CourseRating::getRating)
+                .average()
+                .orElse(0.0));
+        CourseDto map = genericMapper.map(course.get(), CourseDto.class);
+
+
+        return map;
     }
 
     @Override
@@ -61,17 +86,14 @@ public class CourseServiceImpl implements CourseService {
             throw new RuntimeException("Category does not exist");
         }
 
-        User user = userOptional.get();
-        Category category = categoryOptional.get();
 
-        newCourse.setUser(user);
-        newCourse.setCategory(category);
+
+        newCourse.setUser(userOptional.get());
+        newCourse.setCategory(categoryOptional.get());
 
         Course savedCourse = courseRepository.save(newCourse);
-        CourseDto saveCourseDto = genericMapper.map(savedCourse, CourseDto.class);
-        saveCourseDto.setUser(genericMapper.map(user, UserDto.class));
 
-        return saveCourseDto;
+        return genericMapper.map(savedCourse, CourseDto.class);
     }
 
     @Override

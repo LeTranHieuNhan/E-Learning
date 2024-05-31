@@ -3,23 +3,19 @@ package org.example.e_learningback.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.CourseRating;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class TeacherProfileDto {
     private Long id;
+    private String name;
     private String avatar;
     private  String bio;
     private  String occupation;
-    private String name;
     private String email;
-    private String password;
-
-    private RoleDto role;
+    private Double averageRating; // Change the type to Double
+    private long totalReviews;
+    private long totalCourses;
+    private long totalStudents; // Update to totalSessions to match the query
 }
