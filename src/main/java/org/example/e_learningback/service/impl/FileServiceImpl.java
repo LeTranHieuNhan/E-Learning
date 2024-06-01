@@ -25,7 +25,7 @@ public class FileServiceImpl implements FileService {
                         Map.of("public_id", UUID.randomUUID().toString()))
                 .get("url")
                 .toString();
-        File file = new File(null, source);
+        File file = new File(null, source, null);
         File newFile = fileRepository.save(file);
 
         return newFile.getSource();

@@ -25,6 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryDto> findAllCategories() {
         List<Category> categories = categoryRepository.findAll();
+
         return genericMapper.mapList(categories, CategoryDto.class);
     }
 

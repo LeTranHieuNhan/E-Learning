@@ -3,6 +3,7 @@ package org.example.e_learningback.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.dto.RoleDto;
+import org.example.e_learningback.dto.TeacherProfileDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.Role;
@@ -118,5 +119,10 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new RuntimeException("User not found with id: " + id);
         }
+    }
+
+    @Override
+    public TeacherProfileDto getTeacherProfile(Long id) {
+        return userRepository.getTeacherProfile(id).orElseThrow(() -> new RuntimeException("Teacher not found"));
     }
 }

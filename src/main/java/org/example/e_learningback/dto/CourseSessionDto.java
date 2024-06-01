@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,5 +14,6 @@ public class CourseSessionDto {
     private String title;
     private Long sessionOrder;
     private String videoUrl;
+    private CourseDto course;
 
 }

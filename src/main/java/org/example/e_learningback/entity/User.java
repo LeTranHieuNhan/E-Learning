@@ -26,6 +26,13 @@ public class User implements UserDetails {
     private String name;
     private String email;
     private String password;
+    @Column(columnDefinition = "TEXT")
+    @Lob    
+    private String avatar;
+    @Column(columnDefinition = "TEXT")
+    @Lob
+    private  String bio;
+    private  String occupation;
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "role_id")

@@ -37,6 +37,11 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     public void enrollUserToCourse(Long courseId, Long userId) {
         User user = getUserById(userId);
         Course course = getCourseById(courseId);
+
+        if (courseEnrollmentRepository.findByCourse(course) && courseEnrollmentRepository.findByUser(user) || course.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("User is already enrolled to the course or the user is the course owner.");
+        }
+
         CourseEnrollment enrollment = new CourseEnrollment();
         enrollment.setUser(user);
         enrollment.setCourse(course);

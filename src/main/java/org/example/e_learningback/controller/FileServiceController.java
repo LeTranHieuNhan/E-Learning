@@ -15,7 +15,6 @@ public class FileServiceController {
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("image") MultipartFile multipartFile
     ) throws IOException {
-        String imageURL = fileService.uploadFile(multipartFile);
-        return imageURL;
+        return fileService.uploadFile(multipartFile);
     }
 }
