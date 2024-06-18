@@ -14,7 +14,8 @@ public class File {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String source;
+
     @ManyToOne
-    @JoinColumn(name = "images")
+    @JoinColumn(name = "course_id")
     private Course course;
 }

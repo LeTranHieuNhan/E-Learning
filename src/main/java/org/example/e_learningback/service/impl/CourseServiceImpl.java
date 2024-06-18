@@ -1,25 +1,16 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.CategoryDto;
 import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.dto.UserDto;
-import org.example.e_learningback.entity.Category;
-import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.CourseRating;
-import org.example.e_learningback.entity.User;
-import org.example.e_learningback.repository.CategoryRepository;
-import org.example.e_learningback.repository.CourseRatingRepository;
-import org.example.e_learningback.repository.CourseRepository;
-import org.example.e_learningback.repository.UserRepository;
+import org.example.e_learningback.entity.*;
+import org.example.e_learningback.repository.*;
 import org.example.e_learningback.service.CourseService;
-import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,111 +20,132 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final GenericMapper genericMapper;
     private final CourseRatingRepository courseRatingRepository;
+    private final FileRepository fileRepository;
 
     @Override
     public List<CourseDto> findAllCourses() {
         List<Course> courses = courseRepository.findAll();
         courses.forEach(course -> {
-
-List<CourseRating> courseRatings = courseRatingRepository.findAllByCourseId(course.getId());
+            List<CourseRating> courseRatings = courseRatingRepository.findAllByCourseId(course.getId());
             double averageRating = courseRatings.stream()
                     .mapToDouble(CourseRating::getRating)
                     .average()
                     .orElse(0.0);
             course.setAverageRating(averageRating);
             course.setTotalReviews((long) courseRatings.size());
-
-
         });
 
-        return genericMapper.mapList(courses, CourseDto.class);
+        return courses.stream()
+                .map(this::mapToCourseDto)
+                .collect(Collectors.toList());
     }
-
 
     @Override
     public CourseDto findCourseById(Long id) {
-        Optional<Course> course = courseRepository.findById(id);
-
-        if (!course.isPresent()) {
-            throw new RuntimeException("Course does not exist");
-        }
-
-course.get().setTotalReviews((long) courseRatingRepository.findAllByCourseId(course.get().getId()).size());
-course.get().setAverageRating(courseRatingRepository.findAllByCourseId(course.get().getId()).stream()
-                .mapToDouble(CourseRating::getRating)
-                .average()
-                .orElse(0.0));
-        CourseDto map = genericMapper.map(course.get(), CourseDto.class);
-
-
-        return map;
+        return courseRepository.findById(id)
+                .map(course -> {
+                    List<CourseRating> courseRatings = courseRatingRepository.findAllByCourseId(course.getId());
+                    double averageRating = courseRatings.stream()
+                            .mapToDouble(CourseRating::getRating)
+                            .average()
+                            .orElse(0.0);
+                    course.setAverageRating(averageRating);
+                    course.setTotalReviews((long) courseRatings.size());
+                    return mapToCourseDto(course);
+                })
+                .orElseThrow(() -> new RuntimeException("Course does not exist"));
     }
 
     @Override
     @Transactional
     public CourseDto createCourse(CourseDto newCourseDTO, Long userID, Long categoryID) {
-        Course newCourse = genericMapper.map(newCourseDTO, Course.class);
+        Course newCourse = new Course();
+        newCourse.setTitle(newCourseDTO.getTitle());
+        newCourse.setDescription(newCourseDTO.getDescription());
+        newCourse.setCourse_duration(newCourseDTO.getCourse_duration());
 
-        Optional<User> userOptional = userRepository.findById(userID);
-        Optional<Category> categoryOptional = categoryRepository.findById(categoryID);
+        User user = userRepository.findById(userID)
+                .orElseThrow(() -> new RuntimeException("User does not exist"));
+        newCourse.setUser(user);
 
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("User does not exist");
-        }
-        if (categoryOptional.isEmpty()) {
-            throw new RuntimeException("Category does not exist");
-        }
+        Category category = categoryRepository.findById(categoryID)
+                .orElseThrow(() -> new RuntimeException("Category does not exist"));
+        newCourse.setCategory(category);
 
-
-
-        newCourse.setUser(userOptional.get());
-        newCourse.setCategory(categoryOptional.get());
+        newCourse.setImages(newCourseDTO.getImages().stream()
+                .map(fileDto -> {
+                    File file = new File();
+                    file.setSource(fileDto);
+                    file.setCourse(newCourse);
+                    return file;
+                })
+                .collect(Collectors.toList())
+        );
 
         Course savedCourse = courseRepository.save(newCourse);
 
-        return genericMapper.map(savedCourse, CourseDto.class);
+        return mapToCourseDto(savedCourse);
     }
 
     @Override
     @Transactional
     public void deleteCourse(Long id) {
-        boolean isExist = courseRepository.existsById(id);
-
-        if (isExist) {
-            Course course = courseRepository.findById(id).get();
-//            commentRepository.deleteAll(course.getComments());
+        if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Course does not exist");
         }
     }
 
     @Override
     @Transactional
     public CourseDto updateCourse(Long id, CourseDto newCourseDTO) {
-        Optional<Course> courseOptional = courseRepository.findById(id);
+        return courseRepository.findById(id)
+                .map(existingCourse -> {
+                    existingCourse.setTitle(newCourseDTO.getTitle());
+                    existingCourse.setDescription(newCourseDTO.getDescription());
+                    existingCourse.setCourse_duration(newCourseDTO.getCourse_duration());
 
-        if (courseOptional.isPresent()) {
-            Course existingCourse = courseOptional.get();
-
-            existingCourse.setTitle(newCourseDTO.getTitle());
-            existingCourse.setDescription(newCourseDTO.getDescription());
-            existingCourse.setCourse_duration(newCourseDTO.getCourse_duration());
-
-
-            Course savedCourse = courseRepository.save(existingCourse);
-
-            return genericMapper.map(savedCourse, CourseDto.class);
-        } else {
-            throw new RuntimeException("Course with id " + id + " not found");
-        }
+                    Course savedCourse = courseRepository.save(existingCourse);
+                    return mapToCourseDto(savedCourse);
+                })
+                .orElseThrow(() -> new RuntimeException("Course with id " + id + " not found"));
     }
 
     @Override
     public List<CourseDto> searchCourses(String keyword) {
-        List<Course> foundPosts = courseRepository.searchByTitleOrText(keyword);
-        return foundPosts.stream()
-                .map(post -> genericMapper.map(post, CourseDto.class))
+        List<Course> foundCourses = courseRepository.searchByTitleOrText(keyword);
+        return foundCourses.stream()
+                .map(this::mapToCourseDto)
                 .collect(Collectors.toList());
+    }
+
+    // Helper method to map Course entity to CourseDto
+    private CourseDto mapToCourseDto(Course course) {
+        CourseDto courseDto = new CourseDto();
+        courseDto.setId(course.getId());
+        courseDto.setTitle(course.getTitle());
+        courseDto.setDescription(course.getDescription());
+        courseDto.setCourse_duration(course.getCourse_duration());
+        courseDto.setAverageRating(course.getAverageRating());
+        courseDto.setTotalReviews(course.getTotalReviews());
+
+        courseDto.setImages(course.getImages().stream()
+                .map(File::getSource)
+                .collect(Collectors.toList()));
+
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(course.getCategory().getId());
+        categoryDto.setName(course.getCategory().getName());
+        courseDto.setCategory(categoryDto);
+
+        UserDto userDto = new UserDto();
+        userDto.setId(course.getUser().getId());
+        userDto.setName(course.getUser().getUsername());
+        userDto.setEmail(course.getUser().getEmail());
+        courseDto.setUser(userDto);
+
+        return courseDto;
     }
 }

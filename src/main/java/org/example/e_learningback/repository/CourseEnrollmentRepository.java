@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollment, Long> {
@@ -16,4 +17,6 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
     boolean findByCourse(Course course);
 
     boolean findByUser(User user);
+
+    List<CourseEnrollment> findByUserAndCourse(User user, Course course);
 }

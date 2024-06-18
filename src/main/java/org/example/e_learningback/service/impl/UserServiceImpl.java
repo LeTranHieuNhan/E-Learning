@@ -83,11 +83,11 @@ public class UserServiceImpl implements UserService {
         if (isExist) {
             User user = userRepository.findById(id).orElseThrow();
             List<Course> courses = user.getCourses();
-          List <Course> exitCourse= courses.stream().map(course -> {
+            List<Course> exitCourse = courses.stream().map(course -> {
                 course.setUser(null);
                 return course;
             }).toList();
-          courseRepository.saveAll(exitCourse);
+            courseRepository.saveAll(exitCourse);
             userRepository.deleteById(id);
 
         } else
@@ -112,13 +112,23 @@ public class UserServiceImpl implements UserService {
             if (newUserDTO.getPassword() != null) {
                 existingUser.setPassword(newUserDTO.getPassword());
             }
+            if (newUserDTO.getBio() != null) {
+                existingUser.setBio(newUserDTO.getBio());
+            }
+            if (newUserDTO.getAvatar() != null) {
+                existingUser.setAvatar(newUserDTO.getAvatar());
+            }
+            if (newUserDTO.getOccupation() != null) {
+
+                existingUser.setOccupation(newUserDTO.getOccupation());
+            }
+
 
             User savedUser = userRepository.save(existingUser);
 
             return genericMapper.map(savedUser, UserDto.class);
-        } else {
+        } else
             throw new RuntimeException("User not found with id: " + id);
-        }
     }
 
     @Override

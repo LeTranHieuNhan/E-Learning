@@ -38,14 +38,19 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         User user = getUserById(userId);
         Course course = getCourseById(courseId);
 
-        if (courseEnrollmentRepository.findByCourse(course) && courseEnrollmentRepository.findByUser(user) || course.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("User is already enrolled to the course or the user is the course owner.");
+        // Check if the user is already enrolled in the course
+        List<CourseEnrollment> existingEnrollments = courseEnrollmentRepository.findByUserAndCourse(user, course);
+        if (!existingEnrollments.isEmpty() || course.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("User is already enrolled in the course or is the course owner.");
         }
 
+        System.out.println("break point");
         CourseEnrollment enrollment = new CourseEnrollment();
         enrollment.setUser(user);
         enrollment.setCourse(course);
+        System.out.println("break point 2");
         courseEnrollmentRepository.save(enrollment);
+        System.out.println("break point 3");
         initializeAllStudentSessions(courseId, userId);
     }
 
