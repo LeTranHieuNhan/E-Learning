@@ -28,7 +28,11 @@ public class CourseSession {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
     @OneToMany(mappedBy = "courseSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentSession> studentSessions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "courseSession", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments  = new ArrayList<>();
 }
 

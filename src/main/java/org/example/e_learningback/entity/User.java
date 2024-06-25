@@ -50,6 +50,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.getName()));
