@@ -1,6 +1,7 @@
 package org.example.e_learningback.repository;
 
 import org.example.e_learningback.dto.TeacherProfileDto;
+import org.example.e_learningback.dto.TeacherReviewDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,11 +27,19 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "GROUP BY u.id, u.name, u.avatar, u.bio, u.occupation, u.email")
     Optional<TeacherProfileDto> getTeacherProfile(@Param("id") Long id);
 
-
-
-
-
-
-
-
+    @Query("SELECT new org.example.e_learningback.dto.TeacherReviewDto(" +
+            "u.id, u.name, " +
+            "CAST(AVG(cr.rating) AS double), " + // Cast AVG(cr.rating) to double
+            "COUNT(cr.id), " +
+            "SUM(CASE WHEN cr.rating = 1 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN cr.rating = 2 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN cr.rating = 3 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN cr.rating = 4 THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN cr.rating = 5 THEN 1 ELSE 0 END)) " +
+            "FROM User u " +
+            "JOIN Course c ON u.id = c.user.id " +
+            "LEFT JOIN CourseRating cr ON c.id = cr.course.id " +
+            "WHERE u.id = :id AND u.role.name = 'ADMIN' " +
+            "GROUP BY u.id, u.name")
+    Optional<TeacherReviewDto> getTeacherReview(@Param("id") Long id);
 }

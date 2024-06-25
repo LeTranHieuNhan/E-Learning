@@ -1,6 +1,7 @@
 package org.example.e_learningback.service;
 
 import org.example.e_learningback.dto.TeacherProfileDto;
+import org.example.e_learningback.dto.TeacherReviewDto;
 import org.example.e_learningback.dto.UserDto;
 
 import java.io.IOException;
@@ -15,5 +16,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     UserDto updateUser(Long id, UserDto newUserDTO);
-  TeacherProfileDto getTeacherProfile (Long id);
+    TeacherProfileDto getTeacherProfile (Long id);
+    TeacherReviewDto getTeacherReview(Long id);
 }
