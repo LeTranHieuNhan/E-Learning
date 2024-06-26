@@ -17,8 +17,13 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/course_session/{courseSessionId}")
-    public ResponseEntity<List<CommentDto>> getCommentsByCourseSessionId(@PathVariable Long courseSessionId) {
+    public ResponseEntity<List<CommentDto>> getCommentsByCourseSessionId(@PathVariable Long courseSessionId) throws Exception {
         return new ResponseEntity<>(commentService.findAllCommentsByCourseSessionId(courseSessionId), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<CommentDto>> getCommentsByUserId(@PathVariable Long userId) throws Exception {
+        return new ResponseEntity<>(commentService.findAllCommentsByUserId(userId), HttpStatus.OK);
     }
 
     @GetMapping

@@ -28,8 +28,29 @@ public class CommentServiceImpl implements CommentService {
     private final GenericMapper genericMapper;
 
     @Override
-    public List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId) {
-        return commentRepository.findByCourseSessionId(courseSessionId)
+    public List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId) throws Exception{
+        Optional<CourseSession> courseSessionOptional = courseSessionRepository.findById(courseSessionId);
+
+        if (courseSessionOptional.isEmpty()) {
+            throw new Exception("Course session does not exist");
+        }
+
+        return commentRepository.findAllByCourseSession(courseSessionOptional.get())
+                .stream()
+                .map(comment -> genericMapper.map(comment, CommentDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDto> findAllCommentsByUserId(Long userId) throws Exception{
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new Exception("User does not exist");
+        }
+
+
+        return commentRepository.findAllByUser(userOptional.get())
                 .stream()
                 .map(comment -> genericMapper.map(comment, CommentDto.class))
                 .collect(Collectors.toList());

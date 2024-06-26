@@ -5,7 +5,8 @@ import org.example.e_learningback.dto.CommentDto;
 import java.util.List;
 
 public interface CommentService {
-    List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId);
+    List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId) throws Exception;
+    List<CommentDto> findAllCommentsByUserId(Long userId) throws Exception;
     List<CommentDto> findAllComments();
     CommentDto findCommentById(Long id);
     CommentDto createComment(CommentDto commentDto, Long courseSessionId, Long userId) throws Exception;
