@@ -15,5 +15,6 @@ public class CourseSessionDto {
     private Long sessionOrder;
     private String videoUrl;
     private CourseDto course;
+    private String thumbnailUrl;
 
 }

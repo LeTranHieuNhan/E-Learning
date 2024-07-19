@@ -14,6 +14,7 @@ import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
     private final GenericMapper genericMapper;
 
     @Override
-    public List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId) throws Exception{
+    public List<CommentDto> findAllCommentsByCourseSessionId(Long courseSessionId) throws Exception {
         Optional<CourseSession> courseSessionOptional = courseSessionRepository.findById(courseSessionId);
 
         if (courseSessionOptional.isEmpty()) {
@@ -42,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findAllCommentsByUserId(Long userId) throws Exception{
+    public List<CommentDto> findAllCommentsByUserId(Long userId) throws Exception {
         Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isEmpty()) {
@@ -73,17 +74,21 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto createComment(CommentDto commentDto, Long courseSessionId, Long userId) throws Exception{
-        Optional<CourseSession> courseSessionOptional = courseSessionRepository.findById(userId);
+    public CommentDto createComment(CommentDto commentDto, Long courseSessionId, Long userId) throws Exception {
+        Optional<CourseSession> courseSessionOptional = courseSessionRepository.findById(courseSessionId);
         Optional<User> userOptional = userRepository.findById(userId);
-
-        if (courseSessionOptional.isEmpty() || userOptional.isEmpty()) {
-            throw new Exception("Course or User does not exist");
+        if (courseSessionOptional.isEmpty()) {
+            throw new Exception("Course session does not exist");
         }
+        if (userOptional.isEmpty()) {
+            throw new Exception("User does not exist");
+        }
+
         Comment comment = genericMapper.map(commentDto, Comment.class);
 
         comment.setCourseSession(courseSessionOptional.get());
         comment.setUser(userOptional.get());
+        comment.setCreated_at(new Date());
         comment = commentRepository.save(comment);
 
         return genericMapper.map(comment, CommentDto.class);

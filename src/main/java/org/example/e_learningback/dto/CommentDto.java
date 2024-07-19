@@ -17,5 +17,5 @@ public class CommentDto {
     private Date created_at;
 
     private CourseSession courseSession;
-    private User user;
+    private UserDto user;
 }

@@ -32,6 +32,7 @@ public class CourseEnrollmentController {
             @RequestParam Long courseId,
             @RequestParam Long userId
     ) throws Exception {
+        System.out.println("enrollUserToCourse" + courseId + " " + userId);
         courseEnrollmentService.enrollUserToCourse(courseId, userId);
         return ResponseEntity.noContent().build();
     }

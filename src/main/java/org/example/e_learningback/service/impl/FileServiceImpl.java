@@ -14,20 +14,38 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class FileServiceImpl implements FileService {
+class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
     private final FileRepository fileRepository;
 
     @Override
-    public String uploadFile(MultipartFile multipartFile) throws IOException, IOException {
-        String source = cloudinary.uploader()
-                .upload(multipartFile.getBytes(),
-                        Map.of("public_id", UUID.randomUUID().toString()))
-                .get("url")
-                .toString();
-        File file = new File(null, source, null);
+    public String uploadFile(MultipartFile multipartFile) throws IOException {
+        String fileType = multipartFile.getContentType();
+        String resourceType = "auto"; // Let Cloudinary determine the resource type
+
+        if (fileType != null && fileType.startsWith("video")) {
+            resourceType = "video";
+        } else if (fileType != null && fileType.startsWith("image")) {
+            resourceType = "image";
+        } else {
+            resourceType = "raw"; // Default to raw for other file types
+        }
+
+// Upload file to Cloudinary
+        Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                Map.of(
+                        "resource_type", resourceType,
+                        "public_id", UUID.randomUUID().toString()
+                ));
+
+// Extract the URL of the uploaded file
+        String source = uploadResult.get("url").toString();
+
+// Save file URL in the database
+        File file = new File(null, source, null); // Adjust the entity constructor parameters as needed
         File newFile = fileRepository.save(file);
 
+// Return the file URL
         return newFile.getSource();
     }
 }

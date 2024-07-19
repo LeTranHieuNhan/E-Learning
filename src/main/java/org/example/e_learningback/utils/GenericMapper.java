@@ -1,6 +1,9 @@
 package org.example.e_learningback.utils;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.CourseSessionDto;
+import org.example.e_learningback.entity.CourseSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +21,8 @@ public class GenericMapper {
         if (source == null) {
             return null;
         }
-
-        T target = modelMapper.map(source, targetClass);
-
-        return target;
+        return modelMapper.map(source, targetClass);
     }
-
 
     public <S, T> List<T> mapList(List<S> source, Class<T> targetClass) {
         if (source == null) {
@@ -33,5 +32,6 @@ public class GenericMapper {
                 .map(element -> map(element, targetClass))
                 .collect(Collectors.toList());
     }
+
 
 }

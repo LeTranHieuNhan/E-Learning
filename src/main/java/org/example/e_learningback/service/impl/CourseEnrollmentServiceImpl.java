@@ -3,6 +3,7 @@ package org.example.e_learningback.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.*;
 import org.example.e_learningback.entity.*;
+import org.example.e_learningback.exception.UserAlreadyEnrolledException;
 import org.example.e_learningback.repository.*;
 import org.example.e_learningback.service.*;
 import org.example.e_learningback.utils.GenericMapper;
@@ -41,18 +42,16 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         // Check if the user is already enrolled in the course
         List<CourseEnrollment> existingEnrollments = courseEnrollmentRepository.findByUserAndCourse(user, course);
         if (!existingEnrollments.isEmpty() || course.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("User is already enrolled in the course or is the course owner.");
+            throw new UserAlreadyEnrolledException("User is already enrolled in the course or is the course owner.");
         }
 
-        System.out.println("break point");
         CourseEnrollment enrollment = new CourseEnrollment();
         enrollment.setUser(user);
         enrollment.setCourse(course);
-        System.out.println("break point 2");
         courseEnrollmentRepository.save(enrollment);
-        System.out.println("break point 3");
         initializeAllStudentSessions(courseId, userId);
     }
+
 
     @Transactional
     protected void initializeAllStudentSessions(Long courseId, Long userId) {

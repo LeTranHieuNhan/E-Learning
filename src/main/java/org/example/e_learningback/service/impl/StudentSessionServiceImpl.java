@@ -1,6 +1,7 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.example.e_learningback.dto.CourseSessionDto;
 import org.example.e_learningback.dto.StudentSessionDto;
 import org.example.e_learningback.entity.*;
 import org.example.e_learningback.repository.CourseRepository;
@@ -12,6 +13,7 @@ import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +74,24 @@ public class StudentSessionServiceImpl implements StudentSessionService {
         Course course = getCourseById(courseId);
         Optional<List<StudentSession>> studentSessionLists = studentSessionRepository.findAllByCourseAndUser(course, user);
 
-        return studentSessionLists.map(studentSessions -> genericMapper.mapList(studentSessions, StudentSessionDto.class)).orElse(null);
+        if (studentSessionLists.isPresent()) {
+            List<StudentSessionDto> studentSessionDtos = new ArrayList<>();
+            for (StudentSession studentSession : studentSessionLists.get()) {
+                CourseSessionDto courseSessionDto = new CourseSessionDto();
+                courseSessionDto.setVideoUrl(studentSession.getCourseSession().getVideoUrl());
+                courseSessionDto.setTitle(studentSession.getCourseSession().getTitle());
+                courseSessionDto.setSessionOrder(studentSession.getCourseSession().getSessionOrder());
+                courseSessionDto.setId(studentSession.getCourseSession().getId());
+                StudentSessionDto studentSessionDto = new StudentSessionDto();
+                studentSessionDto.setId(studentSession.getId());
+                studentSessionDto.setStatus(studentSession.getStatus());
+                studentSessionDto.setCourseSession(courseSessionDto);
+                studentSessionDtos.add(studentSessionDto);
+            }
+            return studentSessionDtos;
+        } else {
+            return new ArrayList<>();
+        }
     }
+
 }
