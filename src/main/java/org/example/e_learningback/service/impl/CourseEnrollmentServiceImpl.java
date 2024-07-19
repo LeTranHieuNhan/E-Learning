@@ -3,7 +3,7 @@ package org.example.e_learningback.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.*;
 import org.example.e_learningback.entity.*;
-import org.example.e_learningback.exception.UserAlreadyEnrolledException;
+import org.example.e_learningback.exception.*;
 import org.example.e_learningback.repository.*;
 import org.example.e_learningback.service.*;
 import org.example.e_learningback.utils.GenericMapper;
@@ -51,7 +51,6 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
         courseEnrollmentRepository.save(enrollment);
         initializeAllStudentSessions(courseId, userId);
     }
-
 
     @Transactional
     protected void initializeAllStudentSessions(Long courseId, Long userId) {
@@ -102,7 +101,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     public CourseEnrollmentDto findGrade(Long courseId, Long userId) {
         System.out.println(courseId + " " + userId);
         CourseEnrollment enrollment = getCourseEnrollmentByCourseIdAndUserId(courseId, userId);
-            return genericMapper.map(enrollment, CourseEnrollmentDto.class);
+        return genericMapper.map(enrollment, CourseEnrollmentDto.class);
     }
 
     @Override
@@ -139,16 +138,16 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
     private Course getCourseById(Long courseId) {
         return courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course does not exist with ID: " + courseId));
+                .orElseThrow(() -> new CourseNotFoundException("Course does not exist with ID: " + courseId));
     }
 
     private User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User does not exist with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + userId));
     }
 
     private CourseEnrollment getCourseEnrollmentByCourseIdAndUserId(Long courseId, Long userId) {
         return courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Course enrollment does not exist for courseId: " + courseId + " and userId: " + userId));
+                .orElseThrow(() -> new CourseEnrollmentNotFoundException("Course enrollment does not exist for courseId: " + courseId + " and userId: " + userId));
     }
 }

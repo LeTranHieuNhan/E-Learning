@@ -2,12 +2,10 @@ package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.AssignmentDto;
-import org.example.e_learningback.dto.CourseDto;
-import org.example.e_learningback.dto.CourseRatingDto;
-import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.Assignment;
 import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.CourseRating;
+import org.example.e_learningback.exception.AssignmentNotFoundException;
+import org.example.e_learningback.exception.CourseNotFoundException;
 import org.example.e_learningback.repository.AssignmentRepository;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.service.AssignmentService;
@@ -27,6 +25,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final CourseRepository courseRepository;
     private final GenericMapper genericMapper;
+
     @Override
     public List<AssignmentDto> findAllAssignments() {
         List<Assignment> assignments = assignmentRepository.findAll();
@@ -38,18 +37,18 @@ public class AssignmentServiceImpl implements AssignmentService {
         Optional<Assignment> assignment = assignmentRepository.findById(id);
 
         if (assignment.isEmpty()) {
-            throw new RuntimeException("Assignment does not exist");
+            throw new AssignmentNotFoundException("Assignment does not exist");
         }
 
         return genericMapper.map(assignment.get(), AssignmentDto.class);
     }
 
     @Override
-    public List<AssignmentDto> findAllAssignmentsByCourseId(Long courseId) throws Exception {
+    public List<AssignmentDto> findAllAssignmentsByCourseId(Long courseId) {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
 
         if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
+            throw new CourseNotFoundException("Course does not exist");
         }
 
         List<Assignment> assignments = courseOptional.get().getAssignments();
@@ -60,17 +59,16 @@ public class AssignmentServiceImpl implements AssignmentService {
             assignmentDtos.add(assignmentDto);
         }
 
-
         return assignmentDtos;
     }
 
     @Override
     @Transactional
-    public AssignmentDto createAssignment(AssignmentDto newAssignmentDto, Long courseId) throws Exception {
+    public AssignmentDto createAssignment(AssignmentDto newAssignmentDto, Long courseId) {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
 
         if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
+            throw new CourseNotFoundException("Course does not exist");
         }
 
         Assignment assignment = genericMapper.map(newAssignmentDto, Assignment.class);
@@ -85,11 +83,11 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     @Transactional
-    public AssignmentDto updateAssignment(Long id, AssignmentDto newAssignmentDto) throws Exception {
+    public AssignmentDto updateAssignment(Long id, AssignmentDto newAssignmentDto) {
         Optional<Assignment> assignmentOptional = assignmentRepository.findById(id);
 
         if (assignmentOptional.isEmpty()) {
-            throw new Exception("Assignment not found");
+            throw new AssignmentNotFoundException("Assignment not found");
         }
 
         Assignment assignment = assignmentOptional.get();
@@ -108,7 +106,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         if (assignmentRepository.existsById(id)) {
             assignmentRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Assignment not found");
+            throw new AssignmentNotFoundException("Assignment not found");
         }
     }
 }

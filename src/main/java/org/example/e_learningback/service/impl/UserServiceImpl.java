@@ -5,6 +5,8 @@ import org.example.e_learningback.dto.*;
 import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.Role;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.RoleNotFoundException;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.RoleRepository;
 import org.example.e_learningback.repository.UserRepository;
@@ -31,31 +33,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
-
-
         return genericMapper.mapList(users, UserDto.class);
     }
 
-
     @Override
     public UserDto findUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-
-        if (!user.isPresent()) {
-            throw new RuntimeException("User does not exist");
-        }
-
-        return genericMapper.map(user.get(), UserDto.class);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + id));
+        return genericMapper.map(user, UserDto.class);
     }
-
 
     @Override
     @Transactional
     public UserDto createUser(UserDto newUserDTO) throws IOException {
-//        newUserDTO.setPassword(passwordEncoder.encode(newUserDTO.getPassword()));
-        Role role = roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role does not exit "));
+        Role role = roleRepository.findByName("USER")
+                .orElseThrow(() -> new RoleNotFoundException("Role does not exist"));
         User user = genericMapper.map(newUserDTO, User.class);
-
 
         if (user.getRole() == null) {
             user.setRole(new Role());
@@ -71,14 +64,14 @@ public class UserServiceImpl implements UserService {
         return map;
     }
 
-
     @Override
     @Transactional
     public void deleteUser(Long id) {
         boolean isExist = userRepository.existsById(id);
 
         if (isExist) {
-            User user = userRepository.findById(id).orElseThrow();
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + id));
             List<Course> courses = user.getCourses();
             List<Course> exitCourse = courses.stream().map(course -> {
                 course.setUser(null);
@@ -86,55 +79,49 @@ public class UserServiceImpl implements UserService {
             }).toList();
             courseRepository.saveAll(exitCourse);
             userRepository.deleteById(id);
-
-        } else
-            throw new RuntimeException("User doesnt exit with ID " + id);
+        } else {
+            throw new UserNotFoundException("User does not exist with ID: " + id);
+        }
     }
-
 
     @Override
     @Transactional
     public UserDto updateUser(Long id, UserDto newUserDTO) {
-        Optional<User> user = userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-        if (user.isPresent()) {
-            User existingUser = user.get();
+        if (newUserDTO.getName() != null) {
+            user.setName(newUserDTO.getName());
+        }
+        if (newUserDTO.getEmail() != null) {
+            user.setEmail(newUserDTO.getEmail());
+        }
+        if (newUserDTO.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(newUserDTO.getPassword()));
+        }
+        if (newUserDTO.getBio() != null) {
+            user.setBio(newUserDTO.getBio());
+        }
+        if (newUserDTO.getAvatar() != null) {
+            user.setAvatar(newUserDTO.getAvatar());
+        }
+        if (newUserDTO.getOccupation() != null) {
+            user.setOccupation(newUserDTO.getOccupation());
+        }
 
-            if (newUserDTO.getName() != null) {
-                existingUser.setName(newUserDTO.getName());
-            }
-            if (newUserDTO.getEmail() != null) {
-                existingUser.setEmail(newUserDTO.getEmail());
-            }
-            if (newUserDTO.getPassword() != null) {
-                existingUser.setPassword(newUserDTO.getPassword());
-            }
-            if (newUserDTO.getBio() != null) {
-                existingUser.setBio(newUserDTO.getBio());
-            }
-            if (newUserDTO.getAvatar() != null) {
-                existingUser.setAvatar(newUserDTO.getAvatar());
-            }
-            if (newUserDTO.getOccupation() != null) {
-
-                existingUser.setOccupation(newUserDTO.getOccupation());
-            }
-
-
-            User savedUser = userRepository.save(existingUser);
-
-            return genericMapper.map(savedUser, UserDto.class);
-        } else
-            throw new RuntimeException("User not found with id: " + id);
+        User savedUser = userRepository.save(user);
+        return genericMapper.map(savedUser, UserDto.class);
     }
 
     @Override
     public TeacherProfileDto getTeacherProfile(Long id) {
-        return userRepository.getTeacherProfile(id).orElseThrow(() -> new RuntimeException("Teacher not found"));
+        return userRepository.getTeacherProfile(id)
+                .orElseThrow(() -> new UserNotFoundException("Teacher not found with ID: " + id));
     }
 
     @Override
     public TeacherReviewDto getTeacherReview(Long id) {
-        return userRepository.getTeacherReview(id).orElseThrow(() -> new RuntimeException("Teacher not found"));
+        return userRepository.getTeacherReview(id)
+                .orElseThrow(() -> new UserNotFoundException("Teacher not found with ID: " + id));
     }
 }

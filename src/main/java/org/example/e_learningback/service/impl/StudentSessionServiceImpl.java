@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import org.example.e_learningback.dto.CourseSessionDto;
 import org.example.e_learningback.dto.StudentSessionDto;
 import org.example.e_learningback.entity.*;
+import org.example.e_learningback.exception.CourseNotFoundException;
+import org.example.e_learningback.exception.CourseSessionNotFoundException;
+import org.example.e_learningback.exception.StudentSessionNotFoundException;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.CourseSessionRepository;
 import org.example.e_learningback.repository.StudentSessionRepository;
@@ -28,12 +32,12 @@ public class StudentSessionServiceImpl implements StudentSessionService {
 
     private User getUserById(Long studentId) {
         return userRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + studentId));
     }
 
     private Course getCourseById(Long courseId) {
         return courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new CourseNotFoundException("Course not found with ID: " + courseId));
     }
 
     @Transactional
@@ -42,10 +46,9 @@ public class StudentSessionServiceImpl implements StudentSessionService {
         User user = getUserById(studentId);
         Course course = getCourseById(courseId);
         CourseSession courseSession = courseSessionRepository.findById(courseSessionId)
-                .orElseThrow(() -> new RuntimeException("Course session not found"));
+                .orElseThrow(() -> new CourseSessionNotFoundException("Course session not found with ID: " + courseSessionId));
         StudentSession studentSession = studentSessionRepository.findByCourseAndUserAndCourseSession(course, user, courseSession);
         studentSession.setStatus(Status.WATCHED);
-
 
         return "Status changed";
     }
@@ -56,7 +59,7 @@ public class StudentSessionServiceImpl implements StudentSessionService {
         User user = getUserById(studentId);
         Course course = getCourseById(courseId);
         StudentSession studentSession = studentSessionRepository.findByCourseAndUser(course, user)
-                .orElseThrow(() -> new RuntimeException("Student session not found"));
+                .orElseThrow(() -> new StudentSessionNotFoundException("Student session not found with ID: " + courseSessionId));
         studentSessionRepository.delete(studentSession);
     }
 
@@ -93,5 +96,4 @@ public class StudentSessionServiceImpl implements StudentSessionService {
             return new ArrayList<>();
         }
     }
-
 }

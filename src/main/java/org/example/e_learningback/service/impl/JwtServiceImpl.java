@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.JwtService;
 
@@ -75,7 +76,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public UserDto findUserByToken(String token) {
         String email = extractEmail(token);
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
         return genericMapper.map(user, UserDto.class);
     }
 

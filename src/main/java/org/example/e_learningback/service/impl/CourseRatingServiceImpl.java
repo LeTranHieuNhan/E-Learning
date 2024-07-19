@@ -6,12 +6,14 @@ import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.CourseRating;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.CourseNotFoundException;
+import org.example.e_learningback.exception.CourseRatingNotFoundException;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.CourseRatingRepository;
 import org.example.e_learningback.repository.CourseRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.CourseRatingService;
 import org.example.e_learningback.utils.GenericMapper;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,7 @@ public class CourseRatingServiceImpl implements CourseRatingService {
         Optional<CourseRating> courseRating = courseRatingRepository.findById(id);
 
         if (courseRating.isEmpty()) {
-            throw new RuntimeException("Course rating does not exist");
+            throw new CourseRatingNotFoundException("Course rating does not exist");
         }
 
         CourseRatingDto courseRatingDto = genericMapper.map(courseRating.get(), CourseRatingDto.class);
@@ -62,16 +64,15 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     }
 
     @Override
-    public List<CourseRatingDto> findAllCourseRatingsByCourseId(Long courseId) throws Exception {
+    public List<CourseRatingDto> findAllCourseRatingsByCourseId(Long courseId) {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
 
         if (courseOptional.isEmpty()) {
-            throw new Exception("Course does not exist");
+            throw new CourseNotFoundException("Course does not exist");
         }
 
         List<CourseRating> courseRatings = courseOptional.get().getCourseRatings();
         List<CourseRatingDto> courseRatingDtos = new ArrayList<>();
-
 
         for (CourseRating courseRating : courseRatings) {
             CourseRatingDto courseRatingDto = genericMapper.map(courseRating, CourseRatingDto.class);
@@ -88,12 +89,15 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     @Transactional
-    public CourseRatingDto createCourseRating(CourseRatingDto newCourseRatingDto, Long courseId, Long userId) throws Exception {
+    public CourseRatingDto createCourseRating(CourseRatingDto newCourseRatingDto, Long courseId, Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         Optional<Course> courseOptional = courseRepository.findById(courseId);
 
-        if (userOptional.isEmpty() || courseOptional.isEmpty()) {
-            throw new Exception("Course or User does not exist");
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("User does not exist");
+        }
+        if (courseOptional.isEmpty()) {
+            throw new CourseNotFoundException("Course does not exist");
         }
 
         CourseRating courseRating = genericMapper.map(newCourseRatingDto, CourseRating.class);
@@ -116,11 +120,11 @@ public class CourseRatingServiceImpl implements CourseRatingService {
 
     @Override
     @Transactional
-    public CourseRatingDto updateCourseRating(Long courseRatingId, CourseRatingDto newCourseRatingDto) throws Exception {
+    public CourseRatingDto updateCourseRating(Long courseRatingId, CourseRatingDto newCourseRatingDto) {
         Optional<CourseRating> optionalCourseRating = courseRatingRepository.findById(courseRatingId);
 
         if (optionalCourseRating.isEmpty()) {
-            throw new Exception("Course rating not found");
+            throw new CourseRatingNotFoundException("Course rating not found");
         }
 
         CourseRating courseRating = optionalCourseRating.get();
@@ -141,11 +145,9 @@ public class CourseRatingServiceImpl implements CourseRatingService {
     @Transactional
     public void deleteCourseRating(Long courseRatingId) {
         if (courseRatingRepository.existsById(courseRatingId)) {
-
             courseRatingRepository.deleteById(courseRatingId);
-
         } else {
-            throw new RuntimeException("Course rating not found");
+            throw new CourseRatingNotFoundException("Course rating not found");
         }
     }
 }

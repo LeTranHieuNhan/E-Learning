@@ -1,12 +1,13 @@
 package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
-
 import org.example.e_learningback.dto.JwtResponse;
 import org.example.e_learningback.dto.RoleDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.Role;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.CustomNotFoundException;
+import org.example.e_learningback.exception.EmailAlreadyExistsException;
 import org.example.e_learningback.repository.RoleRepository;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.JwtService;
@@ -32,8 +33,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public JwtResponse signUp(UserDto newUser) {
+        if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already registered: " + newUser.getEmail());
+        }
+
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        Role role = roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role does not exist"));
+        Role role = roleRepository.findByName("USER").orElseThrow(() -> new CustomNotFoundException("Role does not exist"));
         User user = genericMapper.map(newUser, User.class);
 
         // Set the user's role
@@ -58,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public JwtResponse signIn(UserDto userDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
         System.out.println("cook");
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new RuntimeException("User not found with email address" + userDto.getEmail()));
+        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new CustomNotFoundException("User not found with email address " + userDto.getEmail()));
         // Generate JWT token for the signed-in user
         String jwt = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);

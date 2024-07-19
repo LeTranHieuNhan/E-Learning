@@ -5,6 +5,9 @@ import org.example.e_learningback.dto.ReplyCommentDto;
 import org.example.e_learningback.entity.Comment;
 import org.example.e_learningback.entity.ReplyComment;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.CommentNotFoundException;
+import org.example.e_learningback.exception.ReplyCommentNotFoundException;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.CommentRepository;
 import org.example.e_learningback.repository.ReplyCommentRepository;
 import org.example.e_learningback.repository.UserRepository;
@@ -17,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class ReplyCommentServiceImpl implements ReplyCommentService {
@@ -28,21 +30,18 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     private final GenericMapper genericMapper;
 
     @Override
-    public ReplyCommentDto findReplyCommentById(Long id) throws Exception {
+    public ReplyCommentDto findReplyCommentById(Long id) {
         ReplyComment replyComment = replyCommentRepository.findById(id)
-                .orElseThrow(() -> new Exception("Reply Comment does not exist"));
+                .orElseThrow(() -> new ReplyCommentNotFoundException("Reply Comment does not exist with ID: " + id));
         return genericMapper.map(replyComment, ReplyCommentDto.class);
     }
 
     @Override
-    public List<ReplyCommentDto> findAllReplyCommentsByCommentId(Long commentId) throws Exception {
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+    public List<ReplyCommentDto> findAllReplyCommentsByCommentId(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment does not exist with ID: " + commentId));
 
-        if (commentOptional.isEmpty()) {
-            throw new Exception("Comment does not exist");
-        }
-
-        List<ReplyComment> replyComments = replyCommentRepository.findAllByComment(commentOptional.get());
+        List<ReplyComment> replyComments = replyCommentRepository.findAllByComment(comment);
 
         return replyComments.stream()
                 .map(replyComment -> genericMapper.map(replyComment, ReplyCommentDto.class))
@@ -50,14 +49,11 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     }
 
     @Override
-    public List<ReplyCommentDto> findAllReplyCommentsByUserId(Long userId) throws Exception {
-        Optional<User> userOptional = userRepository.findById(userId);
+    public List<ReplyCommentDto> findAllReplyCommentsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + userId));
 
-        if (userOptional.isEmpty()) {
-            throw new Exception("User does not exist");
-        }
-
-        List<ReplyComment> replyComments = replyCommentRepository.findAllByUser(userOptional.get());
+        List<ReplyComment> replyComments = replyCommentRepository.findAllByUser(user);
 
         return replyComments.stream()
                 .map(replyComment -> genericMapper.map(replyComment, ReplyCommentDto.class))
@@ -75,21 +71,16 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
 
     @Override
     @Transactional
-    public ReplyCommentDto createReplyComment(ReplyCommentDto newReplyCommentDto, Long commentId, Long userId) throws Exception{
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (commentOptional.isEmpty()) {
-            throw new Exception("Comment does not exist");
-        }
-        if (userOptional.isEmpty()) {
-            throw new Exception("User does not exist");
-        }
+    public ReplyCommentDto createReplyComment(ReplyCommentDto newReplyCommentDto, Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment does not exist with ID: " + commentId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + userId));
 
         ReplyComment replyComment = genericMapper.map(newReplyCommentDto, ReplyComment.class);
 
-        replyComment.setComment(commentOptional.get());
-        replyComment.setUser(userOptional.get());
+        replyComment.setComment(comment);
+        replyComment.setUser(user);
 
         replyComment = replyCommentRepository.save(replyComment);
         return genericMapper.map(replyComment, ReplyCommentDto.class);
@@ -99,7 +90,7 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Transactional
     public ReplyCommentDto updateReplyComment(Long replyCommentId, ReplyCommentDto newReplyCommentDto) {
         ReplyComment existingReplyComment = replyCommentRepository.findById(replyCommentId)
-                .orElseThrow(() -> new RuntimeException("Reply Comment does not exist"));
+                .orElseThrow(() -> new ReplyCommentNotFoundException("Reply Comment does not exist with ID: " + replyCommentId));
 
         existingReplyComment.setBody(newReplyCommentDto.getBody());
 
@@ -110,6 +101,9 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Override
     @Transactional
     public void deleteReplyCommentById(Long replyCommentId) {
+        if (!replyCommentRepository.existsById(replyCommentId)) {
+            throw new ReplyCommentNotFoundException("Reply Comment does not exist with ID: " + replyCommentId);
+        }
         replyCommentRepository.deleteById(replyCommentId);
     }
 
@@ -117,7 +111,7 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Transactional
     public void deleteAllReplyCommentsByCommentId(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment does not exist"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment does not exist with ID: " + commentId));
 
         replyCommentRepository.deleteAllByComment(comment);
     }

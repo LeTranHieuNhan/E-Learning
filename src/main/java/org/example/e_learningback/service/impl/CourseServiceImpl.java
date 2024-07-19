@@ -5,6 +5,9 @@ import org.example.e_learningback.dto.CategoryDto;
 import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.dto.UserDto;
 import org.example.e_learningback.entity.*;
+import org.example.e_learningback.exception.CategoryNotFoundException;
+import org.example.e_learningback.exception.CourseNotFoundException;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.*;
 import org.example.e_learningback.service.CourseService;
 import org.springframework.stereotype.Service;
@@ -54,7 +57,7 @@ public class CourseServiceImpl implements CourseService {
                     course.setTotalReviews((long) courseRatings.size());
                     return mapToCourseDto(course);
                 })
-                .orElseThrow(() -> new RuntimeException("Course does not exist"));
+                .orElseThrow(() -> new CourseNotFoundException("Course does not exist with ID: " + id));
     }
 
     @Override
@@ -66,11 +69,11 @@ public class CourseServiceImpl implements CourseService {
         newCourse.setCourse_duration(newCourseDTO.getCourse_duration());
 
         User user = userRepository.findById(userID)
-                .orElseThrow(() -> new RuntimeException("User does not exist"));
+                .orElseThrow(() -> new UserNotFoundException("User does not exist with ID: " + userID));
         newCourse.setUser(user);
 
         Category category = categoryRepository.findById(categoryID)
-                .orElseThrow(() -> new RuntimeException("Category does not exist"));
+                .orElseThrow(() -> new CategoryNotFoundException("Category does not exist with ID: " + categoryID));
         newCourse.setCategory(category);
 
         newCourse.setImages(newCourseDTO.getImages().stream()
@@ -94,7 +97,7 @@ public class CourseServiceImpl implements CourseService {
         if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Course does not exist");
+            throw new CourseNotFoundException("Course does not exist with ID: " + id);
         }
     }
 
@@ -110,7 +113,7 @@ public class CourseServiceImpl implements CourseService {
                     Course savedCourse = courseRepository.save(existingCourse);
                     return mapToCourseDto(savedCourse);
                 })
-                .orElseThrow(() -> new RuntimeException("Course with id " + id + " not found"));
+                .orElseThrow(() -> new CourseNotFoundException("Course with id " + id + " not found"));
     }
 
     @Override
