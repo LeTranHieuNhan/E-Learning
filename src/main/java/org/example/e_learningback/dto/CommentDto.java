@@ -16,6 +16,6 @@ public class CommentDto {
     private String body;
     private Date created_at;
 
-    private CourseSession courseSession;
+    // private CourseSession courseSession;
     private UserDto user;
 }
