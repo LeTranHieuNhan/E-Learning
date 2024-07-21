@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +22,9 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "course_video_id")
     private CourseSession courseSession;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReplyComment> replyComments;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

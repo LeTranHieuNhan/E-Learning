@@ -2,6 +2,7 @@ package org.example.e_learningback.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.e_learningback.dto.RoleDto;
 import org.example.e_learningback.dto.TeacherProfileDto;
 import org.example.e_learningback.dto.TeacherReviewDto;
 import org.example.e_learningback.dto.UserDto;
@@ -36,10 +37,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto, @RequestParam Long roleId) {
 
 
-        return new ResponseEntity<>(userService.updateUser(id, userDto), HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(id, userDto,roleId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -55,5 +56,10 @@ public class UserController {
     @GetMapping("/teacher_review/{id}")
     public ResponseEntity<TeacherReviewDto> getTeacherReview(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getTeacherReview(id), HttpStatus.OK);
+    }
+    @PutMapping("/assgin/{roleId}/{userId}")
+    public ResponseEntity<UserDto> assignRole(@PathVariable Long roleId, @PathVariable Long userId) {
+        UserDto userDto = userService.assignRole(userId, roleId);
+        return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }

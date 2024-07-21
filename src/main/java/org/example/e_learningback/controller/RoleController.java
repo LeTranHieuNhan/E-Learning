@@ -46,4 +46,5 @@ public class RoleController {
         RoleDto updatedRoleDto = roleService.updateRole(id, name);
         return new ResponseEntity<>(updatedRoleDto, HttpStatus.OK);
     }
+
 }

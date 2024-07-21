@@ -56,9 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/api/v1/course_enrollments/{courseId}/{userId}/grade").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/users/teacher/{id}").permitAll()
                         .requestMatchers("/api/v1/course_sessions/**").permitAll()
-
-
-
+                        .requestMatchers("/api/v1/assignment_submissions/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(

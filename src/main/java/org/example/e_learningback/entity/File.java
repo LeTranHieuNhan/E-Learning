@@ -18,4 +18,11 @@ public class File {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
+    @ManyToOne
+    @JoinColumn(name = "submission_id")
+    private AssignmentSubmission assignmentSubmission;
+
+    public File(Object o, String source, Object o1) {
+    }
 }

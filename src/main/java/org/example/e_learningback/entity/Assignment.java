@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,4 +26,11 @@ public class Assignment {
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
+
+    @OneToMany(mappedBy = "assignment")
+    private List<AssignmentSubmission> assignmentSubmissions = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "assignment_grade_id")
+    private AssignmentGrade grade;
 }

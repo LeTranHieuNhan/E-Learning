@@ -32,7 +32,7 @@ public class CourseEnrollmentController {
             @RequestParam Long courseId,
             @RequestParam Long userId
     ) throws Exception {
-        System.out.println("enrollUserToCourse" + courseId + " " + userId);
+        System.out.println("enrollUserToCourse " + courseId + " " + userId);
         courseEnrollmentService.enrollUserToCourse(courseId, userId);
         return ResponseEntity.noContent().build();
     }
@@ -44,7 +44,7 @@ public class CourseEnrollmentController {
     }
 
     @GetMapping("/courses/grades")
-        public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByCourseId(@RequestParam Long courseId) {
+    public ResponseEntity<List<CourseEnrollmentDto>> getAllGradesByCourseId(@RequestParam Long courseId) {
         try {
             List<CourseEnrollmentDto> grades = courseEnrollmentService.findAllGradesByCourseId(courseId);
             return ResponseEntity.ok(grades);
@@ -92,7 +92,7 @@ public class CourseEnrollmentController {
     @PutMapping("/courses/users/grade")
     public ResponseEntity<Void> updateGrade (
             @RequestParam double grade,
-                @RequestParam Long courseId,
+            @RequestParam Long courseId,
             @RequestParam Long userId
     ) {
         try {

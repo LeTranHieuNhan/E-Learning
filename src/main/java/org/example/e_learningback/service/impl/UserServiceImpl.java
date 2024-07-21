@@ -86,9 +86,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto updateUser(Long id, UserDto newUserDTO) {
+    public UserDto updateUser(Long id, UserDto newUserDTO , Long roleId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RoleNotFoundException("Role not found with ID: " + roleId));
 
         if (newUserDTO.getName() != null) {
             user.setName(newUserDTO.getName());
@@ -108,6 +110,7 @@ public class UserServiceImpl implements UserService {
         if (newUserDTO.getOccupation() != null) {
             user.setOccupation(newUserDTO.getOccupation());
         }
+        user.setRole(role);
 
         User savedUser = userRepository.save(user);
         return genericMapper.map(savedUser, UserDto.class);
@@ -123,5 +126,18 @@ public class UserServiceImpl implements UserService {
     public TeacherReviewDto getTeacherReview(Long id) {
         return userRepository.getTeacherReview(id)
                 .orElseThrow(() -> new UserNotFoundException("Teacher not found with ID: " + id));
+    }
+
+    @Override
+    public UserDto assignRole(Long id, Long roleId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+        Optional<Role> role = roleRepository.findById(roleId);
+        if (role.isPresent()) {
+            user.setRole(role.get());
+            User savedUser = userRepository.save(user);
+            return genericMapper.map(savedUser, UserDto.class);
+        }
+        throw new RoleNotFoundException("Role not found with ID: " + roleId);
     }
 }
