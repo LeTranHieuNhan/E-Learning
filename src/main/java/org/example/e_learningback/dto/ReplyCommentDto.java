@@ -16,6 +16,5 @@ public class ReplyCommentDto {
     private String body;
     private Date created_at;
 
-    private User user;
-    private Comment comment;
+    private UserDto user;
 }

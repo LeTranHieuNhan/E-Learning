@@ -20,6 +20,7 @@ public class Assignment {
     private Date uploaded_at;
     private Date updated_at;
     private Date deadline;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "course_id")

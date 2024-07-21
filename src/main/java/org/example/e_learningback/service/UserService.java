@@ -15,7 +15,8 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    UserDto updateUser(Long id, UserDto newUserDTO);
+    UserDto updateUser(Long id, UserDto newUserDTO , Long roleId);
     TeacherProfileDto getTeacherProfile (Long id);
     TeacherReviewDto getTeacherReview(Long id);
+     UserDto  assignRole(Long id, Long userDto);
 }
