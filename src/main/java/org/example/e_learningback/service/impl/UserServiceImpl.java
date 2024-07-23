@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto updateUser(Long id, UserDto newUserDTO , Long roleId) {
+    public UserDto updateUser(Long id, UserDto newUserDTO, Long roleId) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
         Role role = roleRepository.findById(roleId)

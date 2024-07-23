@@ -25,6 +25,8 @@ public class Comment {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReplyComment> replyComments;
 
+
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -28,7 +28,7 @@ public class CourseSessionController {
         return new ResponseEntity<>(courseSessionService.findCourseSessionById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/{courseId}")
+    @GetMapping("/course/{courseId}")
     public ResponseEntity<List<CourseSessionDto>> getCourseSessionsByCourseId(@PathVariable Long courseId) throws Exception {
         return new ResponseEntity<>(courseSessionService.findAllCourseSessionsByCourseId(courseId), HttpStatus.OK);
     }

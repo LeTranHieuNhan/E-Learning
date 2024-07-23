@@ -31,4 +31,6 @@ public class CourseSession {
 
     @OneToMany(mappedBy = "courseSession", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentSession> studentSessions = new ArrayList<>();
+    @OneToMany(mappedBy = "courseSession", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comment;
 }

@@ -18,5 +18,6 @@ public interface UserService {
     UserDto updateUser(Long id, UserDto newUserDTO , Long roleId);
     TeacherProfileDto getTeacherProfile (Long id);
     TeacherReviewDto getTeacherReview(Long id);
-     UserDto  assignRole(Long id, Long userDto);
+
+    UserDto  assignRole(Long id, Long userDto);
 }

@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto, @RequestParam Long roleId) {
 
 
-        return new ResponseEntity<>(userService.updateUser(id, userDto,roleId), HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(id, userDto, roleId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -57,9 +57,11 @@ public class UserController {
     public ResponseEntity<TeacherReviewDto> getTeacherReview(@PathVariable Long id) {
         return new ResponseEntity<>(userService.getTeacherReview(id), HttpStatus.OK);
     }
+
     @PutMapping("/assgin/{roleId}/{userId}")
     public ResponseEntity<UserDto> assignRole(@PathVariable Long roleId, @PathVariable Long userId) {
         UserDto userDto = userService.assignRole(userId, roleId);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 }
+
