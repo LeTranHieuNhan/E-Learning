@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CommentServiceImpl implements CommentService {
+public class                        CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CourseSessionRepository courseSessionRepository;
     private final UserRepository userRepository;
@@ -83,6 +83,7 @@ public class CommentServiceImpl implements CommentService {
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException("User does not exist");
         }
+
 
         Comment comment = genericMapper.map(commentDto, Comment.class);
         comment.setCourseSession(courseSessionOptional.get());

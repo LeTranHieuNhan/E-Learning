@@ -78,6 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Course> courses = existCategory.getCourses();
         courses.forEach(course -> course.getCategory().setName(existCategory.getName()));
 
+
         Category savedCategory = categoryRepository.save(existCategory);
         courseRepository.saveAll(courses);
         return genericMapper.map(savedCategory, CategoryDto.class);

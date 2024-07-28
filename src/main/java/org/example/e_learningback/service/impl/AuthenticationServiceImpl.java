@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @Service
@@ -43,6 +44,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Set the user's role
         user.setRole(role);
+        LocalDateTime now = LocalDateTime.now();
+        user.setJoinedAt(now);
 
         User savedUser = userRepository.save(user);
         UserDto mappedUser = genericMapper.map(savedUser, UserDto.class);

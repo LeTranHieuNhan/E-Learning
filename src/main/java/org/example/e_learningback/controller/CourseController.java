@@ -49,4 +49,12 @@ public class CourseController {
     public List<CourseDto> searchPosts(@RequestParam String keyword) {
         return courseService.searchCourses(keyword);
     }
+    @GetMapping("/teachers/{id}")
+    public List<CourseDto> getTeacherCourses(@PathVariable Long id) {
+        return courseService.getTeacherCourse(id);
+    }
+    @GetMapping("/user_enrolled/{id}")
+    public List<CourseDto> getStudentEnrolledCourses(@PathVariable Long id) {
+        return courseService.getStudentCourse(id);
+    }
 }

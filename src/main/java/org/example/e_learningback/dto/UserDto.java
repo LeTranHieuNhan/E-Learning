@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.CourseRating;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,4 +23,5 @@ public class UserDto {
     private String password;
 
     private RoleDto role;
+    private LocalDateTime joinedAt;
 }

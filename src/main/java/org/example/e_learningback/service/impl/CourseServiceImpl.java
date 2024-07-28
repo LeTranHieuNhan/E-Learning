@@ -25,6 +25,7 @@ public class CourseServiceImpl implements CourseService {
     private final CategoryRepository categoryRepository;
     private final CourseRatingRepository courseRatingRepository;
     private final FileRepository fileRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
 
     @Override
     public List<CourseDto> findAllCourses() {
@@ -106,15 +107,41 @@ public class CourseServiceImpl implements CourseService {
     public CourseDto updateCourse(Long id, CourseDto newCourseDTO) {
         return courseRepository.findById(id)
                 .map(existingCourse -> {
+                    // Update basic fields
                     existingCourse.setTitle(newCourseDTO.getTitle());
                     existingCourse.setDescription(newCourseDTO.getDescription());
                     existingCourse.setCourse_duration(newCourseDTO.getCourse_duration());
 
+                    // Handle images
+                    // Remove all existing images individually to enable orphan removal
+                    List<File> currentImages = existingCourse.getImages();
+                    if (currentImages != null) {
+                        Iterator<File> iterator = currentImages.iterator();
+                        while (iterator.hasNext()) {
+                            File file = iterator.next();
+                            iterator.remove();
+                        }
+                    }
+
+                    // Add new images
+                    List<File> newImages = newCourseDTO.getImages().stream()
+                            .map(fileDto -> {
+                                File file = new File();
+                                file.setSource(fileDto);
+                                file.setCourse(existingCourse);
+                                return file;
+                            })
+                            .collect(Collectors.toList());
+
+                    existingCourse.getImages().addAll(newImages);
+
+                    // Save and return updated course
                     Course savedCourse = courseRepository.save(existingCourse);
                     return mapToCourseDto(savedCourse);
                 })
                 .orElseThrow(() -> new CourseNotFoundException("Course with id " + id + " not found"));
     }
+
 
     @Override
     public List<CourseDto> searchCourses(String keyword) {
@@ -122,6 +149,25 @@ public class CourseServiceImpl implements CourseService {
         return foundCourses.stream()
                 .map(this::mapToCourseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CourseDto> getTeacherCourse(Long teacherId) {
+        Course course = courseRepository.findByUserId(teacherId).orElseThrow(() -> new UserNotFoundException("Teacher does not exist with ID: " + teacherId));
+
+        return courseRepository.findAllByUserId(teacherId).stream()
+                .map(this::mapToCourseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CourseDto> getStudentCourse(Long studentId) {
+
+        return courseEnrollmentRepository.findAllByUserId(studentId).stream()
+                .map(CourseEnrollment::getCourse)
+                .map(this::mapToCourseDto)
+                .collect(Collectors.toList());
+
     }
 
     // Helper method to map Course entity to CourseDto
@@ -147,6 +193,8 @@ public class CourseServiceImpl implements CourseService {
         userDto.setId(course.getUser().getId());
         userDto.setName(course.getUser().getUsername());
         userDto.setEmail(course.getUser().getEmail());
+        userDto.setAvatar(course.getUser().getAvatar());
+        userDto.setBio(course.getUser().getBio());
         courseDto.setUser(userDto);
 
         return courseDto;

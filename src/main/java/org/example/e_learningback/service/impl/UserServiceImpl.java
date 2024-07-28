@@ -2,14 +2,10 @@ package org.example.e_learningback.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.dto.*;
-import org.example.e_learningback.entity.Course;
-import org.example.e_learningback.entity.Role;
-import org.example.e_learningback.entity.User;
+import org.example.e_learningback.entity.*;
 import org.example.e_learningback.exception.RoleNotFoundException;
 import org.example.e_learningback.exception.UserNotFoundException;
-import org.example.e_learningback.repository.CourseRepository;
-import org.example.e_learningback.repository.RoleRepository;
-import org.example.e_learningback.repository.UserRepository;
+import org.example.e_learningback.repository.*;
 import org.example.e_learningback.service.UserService;
 import org.example.e_learningback.utils.GenericMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +27,8 @@ public class UserServiceImpl implements UserService {
     private final GenericMapper genericMapper;
     private final PasswordEncoder passwordEncoder;
     private final CourseRepository courseRepository;
+    private  final StudentSessionRepository studentSessionRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
 
     @Override
     public List<UserDto> findAllUsers() {
@@ -77,6 +77,13 @@ public class UserServiceImpl implements UserService {
                 course.setUser(null);
                 return course;
             }).toList();
+            List<StudentSession> studentSessions = user.getStudentSessions();
+            studentSessions.forEach(studentSession -> studentSession.setUser(null));
+            studentSessionRepository.saveAll(studentSessions);
+            List<CourseEnrollment> courseEnrollments = user.getCourseEnrollments();
+            courseEnrollments.forEach(courseEnrollment -> courseEnrollment.setUser(null));
+            courseEnrollmentRepository.saveAll(courseEnrollments);
+
             courseRepository.saveAll(exitCourse);
             userRepository.deleteById(id);
         } else {
@@ -139,5 +146,11 @@ public class UserServiceImpl implements UserService {
             return genericMapper.map(savedUser, UserDto.class);
         }
         throw new RoleNotFoundException("Role not found with ID: " + roleId);
+    }
+
+    @Override
+    public List<UserDto> getNewUsersOfTheWeek() {
+        LocalDateTime startOfWeek = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(7);
+        return genericMapper.mapList(userRepository.findNewUsersOfTheWeek(startOfWeek), UserDto.class);
     }
 }

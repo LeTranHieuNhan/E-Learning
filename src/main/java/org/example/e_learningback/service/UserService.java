@@ -20,4 +20,6 @@ public interface UserService {
     TeacherReviewDto getTeacherReview(Long id);
 
     UserDto  assignRole(Long id, Long userDto);
+     List<UserDto> getNewUsersOfTheWeek() ;
+
 }

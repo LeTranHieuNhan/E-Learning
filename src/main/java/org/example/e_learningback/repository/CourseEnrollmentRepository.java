@@ -1,5 +1,6 @@
 package org.example.e_learningback.repository;
 
+import org.example.e_learningback.dto.CourseDto;
 import org.example.e_learningback.entity.Course;
 import org.example.e_learningback.entity.CourseEnrollment;
 import org.example.e_learningback.entity.User;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +21,6 @@ public interface CourseEnrollmentRepository extends JpaRepository<CourseEnrollme
     boolean findByUser(User user);
 
     List<CourseEnrollment> findByUserAndCourse(User user, Course course);
+
+    Collection<CourseEnrollment> findAllByUserId(Long studentId);
 }

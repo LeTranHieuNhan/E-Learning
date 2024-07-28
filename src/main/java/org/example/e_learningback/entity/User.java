@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,12 +28,13 @@ public class User implements UserDetails {
     private String email;
     private String password;
     @Column(columnDefinition = "TEXT")
-    @Lob    
+    @Lob
     private String avatar;
     @Column(columnDefinition = "TEXT")
     @Lob
     private  String bio;
     private  String occupation;
+    private LocalDateTime joinedAt = LocalDateTime.now();
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "role_id")
@@ -50,8 +52,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<CourseEnrollment> courseEnrollments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ReplyComment> replyComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<AssignmentSubmission> assignmentSubmissions = new ArrayList<>();

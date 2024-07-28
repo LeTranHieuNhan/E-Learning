@@ -41,7 +41,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
 
         // Check if the user is already enrolled in the course
         List<CourseEnrollment> existingEnrollments = courseEnrollmentRepository.findByUserAndCourse(user, course);
-        if (!existingEnrollments.isEmpty() || course.getUser().getId().equals(userId)) {
+        if (!existingEnrollments.isEmpty() ) {
             throw new UserAlreadyEnrolledException("User is already enrolled in the course or is the course owner.");
         }
 
@@ -56,16 +56,17 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     protected void initializeAllStudentSessions(Long courseId, Long userId) {
         Course course = getCourseById(courseId);
         User user = getUserById(userId);
-        course.getCourseSessions().forEach(courseSession -> initializeStudentSession(courseSession, user));
+        boolean isAdmin = isAdmin(user);
+        course.getCourseSessions().forEach(courseSession -> initializeStudentSession(courseSession, user, isAdmin));
     }
 
     @Transactional
-    public void initializeStudentSession(CourseSession courseSession, User user) {
+    public void initializeStudentSession(CourseSession courseSession, User user, boolean isAdmin) {
         StudentSession studentSession = new StudentSession();
         Course course = courseSession.getCourse();
         studentSession.setCourse(course);
         studentSession.setUser(user);
-        studentSession.setStatus(Status.UNWATCHED);
+        studentSession.setStatus(isAdmin ? Status.WATCHED : Status.UNWATCHED);
         studentSession.setCourseSession(courseSession);
         studentSessionRepository.save(studentSession);
     }
@@ -149,5 +150,10 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService {
     private CourseEnrollment getCourseEnrollmentByCourseIdAndUserId(Long courseId, Long userId) {
         return courseEnrollmentRepository.findByCourseIdAndUserId(courseId, userId)
                 .orElseThrow(() -> new CourseEnrollmentNotFoundException("Course enrollment does not exist for courseId: " + courseId + " and userId: " + userId));
+    }
+
+    private boolean isAdmin(User user) {
+        // Assuming roles are stored as a collection in the User entity
+        return user.getRole().getName().equals("ADMIN");
     }
 }

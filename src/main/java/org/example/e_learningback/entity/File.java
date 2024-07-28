@@ -23,6 +23,5 @@ public class File {
     @JoinColumn(name = "submission_id")
     private AssignmentSubmission assignmentSubmission;
 
-    public File(Object o, String source, Object o1) {
-    }
+
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-class FileServiceImpl implements FileService {
+public class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
     private final FileRepository fileRepository;
 
@@ -32,30 +32,33 @@ class FileServiceImpl implements FileService {
             resourceType = "raw"; // Default to raw for other file types
         }
 
-        // Upload file to Cloudinary
-        Map<String, Object> uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
-                ObjectUtils.asMap(
-                        "resource_type", resourceType,
-                        "public_id", UUID.randomUUID().toString()
-                ));
+        try {
+            // Upload file to Cloudinary
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(),
+                    ObjectUtils.asMap(
+                            "resource_type", resourceType,
+                            "public_id", UUID.randomUUID().toString()
+                    ));
 
-        // Extract the URL of the uploaded file
-        String source = (String) uploadResult.get("secure_url"); // Using secure_url for HTTPS
+            // Extract the URL of the uploaded file
+            String source = (String) uploadResult.get("secure_url"); // Using secure_url for HTTPS
 
-        if (source == null) {
-            source = (String) uploadResult.get("url");
+            if (source == null) {
+                source = (String) uploadResult.get("url");
+            }
+
+            if (source == null) {
+                throw new IOException("Failed to retrieve URL from Cloudinary response.");
+            }
+
+            // Save file URL in the database
+            File file = new File(null, source, null, null); // Adjust the entity constructor parameters as needed
+            File newFile = fileRepository.save(file);
+
+            // Return the file URL
+            return source;
+        } catch (Exception e) {
+            throw new IOException("Failed to upload file to Cloudinary", e);
         }
-
-        if (source == null) {
-            throw new IOException("Failed to retrieve URL from Cloudinary response.");
-        }
-
-        // Save file URL in the database
-        File file = new File(null, source, null); // Adjust the entity constructor parameters as needed
-        File newFile = fileRepository.save(file);
-
-        // Return the file URL
-        System.out.println("File URL: " + (String) uploadResult.get("url"));
-        return (String) uploadResult.get("url");
     }
 }

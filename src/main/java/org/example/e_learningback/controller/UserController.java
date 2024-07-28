@@ -63,5 +63,10 @@ public class UserController {
         UserDto userDto = userService.assignRole(userId, roleId);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
+    @GetMapping("/newUsers")
+    public ResponseEntity<List<UserDto>> getNewUsers() {
+        return new ResponseEntity<>(userService.getNewUsersOfTheWeek(), HttpStatus.OK);
+    }
+
 }
 
