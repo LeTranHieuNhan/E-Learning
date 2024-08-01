@@ -1,6 +1,5 @@
 package org.example.e_learningback.config;
 
-import com.cloudinary.utils.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,9 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.e_learningback.entity.User;
+import org.example.e_learningback.exception.UserNotFoundException;
 import org.example.e_learningback.repository.UserRepository;
 import org.example.e_learningback.service.JwtService;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,31 +32,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-       
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
+
+        // Check if the Authorization header is present and starts with "Bearer "
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
+
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractEmail(jwt);
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User userDetails = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found with Email address " + userEmail));
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        try {
+            userEmail = jwtService.extractEmail(jwt);
+
+            // Proceed only if the user email is not null and the user is not already authenticated
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User userDetails = userRepository.findByEmail(userEmail)
+                        .orElseThrow(() -> new UserNotFoundException("User not found with Email address " + userEmail));
+
+                // Validate the token and set the authentication if valid
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (UserNotFoundException e ) {
+            // Set response status to 401 if an authentication-related exception is caught
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, " User not found");
+            return;
+        } catch (Exception e) {
+            // Handle other exceptions, setting a general 401 Unauthorized status
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            return;
         }
-        System.out.println("Filtering request");
+
         filterChain.doFilter(request, response);
     }
 }

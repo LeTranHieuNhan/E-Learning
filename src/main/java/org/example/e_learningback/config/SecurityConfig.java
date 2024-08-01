@@ -2,6 +2,7 @@ package org.example.e_learningback.config;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.http.protocol.HTTP;
+import org.example.e_learningback.exception.GlobalExceptionHandler;
 import org.example.e_learningback.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,6 +65,7 @@ public class SecurityConfig {
                         sessionManagement -> sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
